@@ -35,7 +35,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.ewoudje:lasagna-fabric:${project.lasagna_version}"
-	modImplementation("curse.maven:sodium-394468:3669187")
+	modCompileOnly("curse.maven:sodium-394468:3669187")
 }
 
 processResources {
