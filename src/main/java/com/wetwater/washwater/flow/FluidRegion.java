@@ -1,5 +1,7 @@
 package com.wetwater.washwater.flow;
 
+import com.wetwater.washwater.WaterInfo;
+import com.wetwater.washwater.WaterMod;
 import net.minecraft.core.BlockPos;
 
 public interface FluidRegion {
@@ -33,6 +35,12 @@ public interface FluidRegion {
     }
 
     default void setVolume(BlockPos pos, int volume) {
+        if (volume > WaterInfo.volumePerBlock) {
+            setVolume(pos, WaterInfo.volumePerBlock);
+            WaterMod.LOGGER.warn("Tried to set water volume higher than max");
+            return;
+        }
+
         setVolume(pos.getX(), pos.getY(), pos.getZ(), volume);
     }
 

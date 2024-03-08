@@ -12,7 +12,19 @@ public class FluidFlow {
         int volume = region.getVolume(pos);
 
         if (volume > 0) {
-            equalizeWater(region, pos, volume);
+
+            //Flow down
+            var underVolume = region.getVolume(pos.getX(), pos.getY() -1 , pos.getZ());
+            if (underVolume >= 0 && underVolume < WaterInfo.volumePerBlock) {
+                var transaction = Math.min(volume, WaterInfo.volumePerBlock - underVolume);
+                region.setVolume(pos, volume - transaction);
+                region.setVolume(pos.getX(), pos.getY() - 1, pos.getZ(), underVolume + transaction);
+
+                volume -= transaction;
+            } else {
+                //If under is solid or filled up then flow to sides
+                equalizeWater(region, pos, volume);
+            }
         } else WaterMod.LOGGER.warn("Ticking water with no volume");
     }
 
@@ -23,14 +35,10 @@ public class FluidFlow {
         for (Direction direction : HORIZONTAL_DIRECTIONS) {
             BlockPos offset = owner.relative(direction);
             int otherVolume = region.getVolume(offset);
+            if (otherVolume < 0) continue;
 
             int transfer = (otherVolume - volume) / 2;
-
-            if (volume + 1 > otherVolume) {
-                transfer = -transfer;
-            }
-
-            if (transfer > 1) {
+            if (transfer > 1 || transfer < -1) {
                 region.setVolume(offset, otherVolume - transfer);
                 region.setVolume(owner, volume + transfer);
             }
