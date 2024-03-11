@@ -17,6 +17,7 @@ import me.jellysquid.mods.sodium.client.model.quad.properties.ModelQuadWinding;
 import me.jellysquid.mods.sodium.client.render.chunk.compile.buffers.ChunkModelBuilder;
 import me.jellysquid.mods.sodium.client.render.chunk.format.ModelVertexSink;
 import me.jellysquid.mods.sodium.client.util.Norm3b;
+import me.jellysquid.mods.sodium.client.util.color.ColorABGR;
 import me.jellysquid.mods.sodium.common.util.DirectionUtil;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;
@@ -36,20 +37,18 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
 public class WashFluidRenderer {
-    private static WashFluidRenderer instance;
+    private static ThreadLocal<WashFluidRenderer> instance = new ThreadLocal<>();
     public static WashFluidRenderer getInstance(me.jellysquid.mods.sodium.client.render.pipeline.FluidRenderer renderer) {
-        if (instance == null) {
+        if (instance.get() == null) {
             FluidRendererAccessor accessor = (FluidRendererAccessor) renderer;
-            instance = new WashFluidRenderer(accessor.getLighters(), accessor.getColorBlender());
+            instance.set(new WashFluidRenderer(accessor.getLighters(), accessor.getColorBlender()));
         }
-        return instance;
+        return instance.get();
     }
 
-    // TODO: allow this to be changed by vertex format
-    // TODO: move fluid rendering to a separate render pass and control glPolygonOffset and glDepthFunc to fix this properly
     private static final float EPSILON = 0.001f;
 
-    private final BlockPos.MutableBlockPos scratchPos = new BlockPos.MutableBlockPos();
+    private final BlockPos.MutableBlockPos tmpPos = new BlockPos.MutableBlockPos();
 
     private final TextureAtlasSprite waterOverlaySprite;
 
@@ -68,7 +67,6 @@ public class WashFluidRenderer {
         this.waterOverlaySprite = ModelBakery.WATER_OVERLAY.sprite();
 
         int normal = Norm3b.pack(0.0f, 1.0f, 0.0f);
-
         for (int i = 0; i < 4; i++) {
             this.quad.setNormal(i, normal);
         }
@@ -139,13 +137,18 @@ public class WashFluidRenderer {
         boolean isWater = fluidState.is(FluidTags.WATER);
 
         FluidRenderHandler handler = FluidRenderHandlerRegistryImpl.INSTANCE.get(fluidState.getType());
-        ColorSampler<FluidState> colorizer = this.createColorProviderAdapter(handler);
+        //ColorSampler<FluidState> colorizer = this.createColorProviderAdapter(handler);
 
         TextureAtlasSprite[] sprites = handler.getFluidSprites(level, pos, fluidState);
 
         boolean rendered = false;
 
         float height = WaterInfo.getHeight(volume);
+        if (height <= 0.0f) {
+            WaterMod.LOGGER.warn("Rendering water with no or less volume");
+        } else if (height > 1.0f) {
+            WaterMod.LOGGER.warn("Rendering water with more then max volume");
+        }
 
         float h1 = height;
         float h2 = height;
@@ -223,14 +226,14 @@ public class WashFluidRenderer {
             this.setVertex(quad, 2, 1.0F, h3, 1.0F, u3, v3);
             this.setVertex(quad, 3, 1.0F, h4, 0.0f, u4, v4);
 
-            this.calculateQuadColors(quad, level, pos, lighter, Direction.UP, 1.0F, colorizer, fluidState);
+            this.calculateQuadColors(quad, level, pos, lighter, Direction.UP, 1.0F, null, fluidState);
 
             int vertexStart = this.writeVertices(buffers, offset, quad);
 
             buffers.getIndexBufferBuilder(facing)
                     .add(vertexStart, ModelQuadWinding.CLOCKWISE);
 
-            if (fluidState.shouldRenderBackwardUpFace(level, this.scratchPos.set(posX, posY + 1, posZ))) {
+            if (fluidState.shouldRenderBackwardUpFace(level, this.tmpPos.set(posX, posY + 1, posZ))) {
                 buffers.getIndexBufferBuilder(ModelQuadFacing.DOWN)
                         .add(vertexStart, ModelQuadWinding.COUNTERCLOCKWISE);
             }
@@ -252,7 +255,7 @@ public class WashFluidRenderer {
             this.setVertex(quad, 2, 1.0F, yOffset, 0.0f, maxU, minV);
             this.setVertex(quad, 3, 1.0F, yOffset, 1.0F, maxU, maxV);
 
-            this.calculateQuadColors(quad, level, pos, lighter, Direction.DOWN, 1.0F, colorizer, fluidState);
+            this.calculateQuadColors(quad, level, pos, lighter, Direction.DOWN, 1.0F, null, fluidState);
 
             int vertexStart = this.writeVertices(buffers, offset, quad);
 
@@ -332,8 +335,9 @@ public class WashFluidRenderer {
 
                 TextureAtlasSprite sprite = sprites[1];
 
+                /*
                 if (isWater) {
-                    BlockPos adjPos = this.scratchPos.set(adjX, adjY, adjZ);
+                    BlockPos adjPos = this.tmpPos.set(adjX, adjY, adjZ);
                     BlockState adjBlock = level.getBlockState(adjPos);
 
                     if (!adjBlock.canOcclude() && !adjBlock.isAir()) {
@@ -341,7 +345,7 @@ public class WashFluidRenderer {
                         sprite = this.waterOverlaySprite;
 
                     }
-                }
+                }*/
 
                 float u1 = sprite.getU(0.0D);
                 float u2 = sprite.getU(8.0D);
@@ -360,7 +364,7 @@ public class WashFluidRenderer {
 
                 ModelQuadFacing facing = ModelQuadFacing.fromDirection(dir);
 
-                this.calculateQuadColors(quad, level, pos, lighter, dir, br, colorizer, fluidState);
+                this.calculateQuadColors(quad, level, pos, lighter, dir, br, null, fluidState);
 
                 int vertexStart = this.writeVertices(buffers, offset, quad);
 
@@ -388,16 +392,16 @@ public class WashFluidRenderer {
 
     private void calculateQuadColors(ModelQuadView quad, BlockAndTintGetter level, BlockPos pos, LightPipeline lighter, Direction dir, float brightness,
                                      ColorSampler<FluidState> colorSampler, FluidState fluidState) {
-        /*QuadLightData light = this.quadLightData;
-        lighter.calculate(quad, pos, light, dir, false);
-
+        //QuadLightData light = this.quadLightData;
+        //lighter.calculate(quad, pos, light, dir, false);
+/*
         int[] biomeColors = this.colorBlender.getColors(level, pos, quad, colorSampler, fluidState);
 
         for (int i = 0; i < 4; i++) {
             this.quadColors[i] = ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, light.br[i] * brightness);
         }*/
         for (int i = 0; i < 4; i++) {
-            this.quadColors[i] = 0xFFFFFFFF;
+            this.quadColors[i] = ColorABGR.mul(0xFFFFFFFF, brightness);
         }
     }
 
@@ -417,7 +421,7 @@ public class WashFluidRenderer {
             float u = quad.getTexU(i);
             float v = quad.getTexV(i);
 
-            int light = this.quadLightData.lm[i];
+            int light = 15;//this.quadLightData.lm[i];
 
             vertices.writeVertex(offset, x, y, z, color, u, v, light, builder.getChunkId());
         }

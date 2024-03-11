@@ -30,6 +30,12 @@ public class FluidTicker {
         getCurrentWaterList(level).add(BlockPos.asLong(x, y, z));
     }
 
+    public static void tickIfWater(ServerLevel level, int x, int y, int z) {
+        if (FluidManager.getVolume(level, x, y, z) > 0) {
+            getCurrentWaterList(level).add(BlockPos.asLong(x, y, z));
+        }
+    }
+
     public static boolean shouldTick(ServerLevel level) {
         return counter % FluidManager.tickSpeed(level) == 0;
     }

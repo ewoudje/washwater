@@ -3,6 +3,7 @@ package com.wetwater.washwater;
 import com.ewoudje.lasagna.chunkstorage.ExtraStorageSectionContainer;
 import com.wetwater.washwater.scheduling.FluidTicker;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
@@ -52,7 +53,13 @@ public class FluidManager {
         }
 
         fSection.setWaterVolume(x & 15, y & 15, z & 15, (short) volume);
-        FluidTicker.tickWater(level, x, y, z);
+
+        if (volume != 0) {
+            FluidTicker.tickWater(level, x, y, z);
+            for (var direction : Direction.values()) {
+                FluidTicker.tickIfWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
+            }
+        }
     }
 
     public static int getVolume(Level level, int x, int y, int z) {

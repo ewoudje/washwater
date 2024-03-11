@@ -30,6 +30,7 @@ public class FluidSection implements ExtraSectionStorage {
     private int[] dirty = null;
     private int dirtyCount = 0;
     private boolean anyDirt = false;
+    private boolean isSavedDirty = false;
     private final LevelChunk chunk;
     private final int sectionIndex;
 
@@ -57,6 +58,8 @@ public class FluidSection implements ExtraSectionStorage {
                 }
             }
         }
+
+        isSavedDirty = true;
     }
 
     private FluidSection(ShortBuffer shorts, @NotNull LevelChunk chunk, int sectionIndex) {
@@ -123,6 +126,7 @@ public class FluidSection implements ExtraSectionStorage {
     // relative coordinates
     public void setWaterVolume(int x, int y, int z, short value) {
         water[(x*16*16) + (y * 16) + z] = value;
+        isSavedDirty = true;
 
         if (dirty != null) {
             dirty[x * 8 + y / 2] |= 1 << (z + ((y % 4) * 16));
@@ -204,13 +208,13 @@ public class FluidSection implements ExtraSectionStorage {
         return fSection;
     }
 
-    @Override
+    @Override // Dirty for saving
     public boolean isDirty() {
-        return true;
+        return isSavedDirty;
     }
 
     @Override
     public void saved() {
-
+        isSavedDirty = false;
     }
 }

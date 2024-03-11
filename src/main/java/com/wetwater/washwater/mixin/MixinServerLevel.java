@@ -1,14 +1,14 @@
 package com.wetwater.washwater.mixin;
 
 import com.wetwater.washwater.FluidSection;
-import com.wetwater.washwater.TickedPseudoRandom;
+import com.wetwater.washwater.WaterMod;
+import com.wetwater.washwater.flow.PseudoRandom;
 import com.wetwater.washwater.scheduling.FluidTicker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.material.Fluid;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,9 +20,9 @@ public abstract class MixinServerLevel  {
 
     @Inject(at = @At("HEAD"), method = "tick", cancellable = true)
     public void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-        TickedPseudoRandom.increaseTickCounter();
         FluidTicker.tick((ServerLevel) (Object) this);
         FluidSection.sendUpdates();
+        WaterMod.currentTick++;
     }
 
     /**

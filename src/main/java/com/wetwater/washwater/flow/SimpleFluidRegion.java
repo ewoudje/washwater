@@ -27,9 +27,11 @@ public class SimpleFluidRegion implements FluidRegion {
     public void setVolume(int x, int y, int z, int volume) {
         getSection(x, y, z).setWaterVolume(x & 15, y & 15, z & 15, (short) volume);
 
-        FluidTicker.tickWater(level, x, y, z);
-        for (Direction direction : Direction.values()) {
-            FluidTicker.tickWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
+        if (volume != 0) {
+            FluidTicker.tickWater(level, x, y, z);
+            for (Direction direction : Direction.values()) {
+                FluidTicker.tickIfWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
+            }
         }
     }
 

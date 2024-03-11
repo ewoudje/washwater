@@ -10,6 +10,7 @@ public class WaterInfo {
     public static short volumePerLevel = (short) ((volumePerBlock / 8) + 1);
     public static short cutOffValue = (short) (volumePerLevel * 7);
     public static short surfaceTensionLimit = 20;
+    public static int flowDivider = 8;
 
     public static short getWaterVolumeOfState(BlockState state) {
         if (state.isAir())
