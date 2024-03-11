@@ -1,5 +1,6 @@
 package com.wetwater.washwater;
 
+import com.wetwater.washwater.util.OnInit;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,7 @@ public class WaterMod implements ModInitializer {
 		LOGGER.info("Hello Fabric world!");
 
 		FluidSection.register();
+		OnInit.initializeThings();
 	}
 
 	public static ResourceLocation resource(String name) {
