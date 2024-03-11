@@ -51,15 +51,17 @@ public class FluidFlow {
     public static void equalizeWaterRnd(FluidRegion region, BlockPos owner, int volume) {
         if (volume < WaterInfo.surfaceTensionLimit) return;
 
+        //System.out.println("water volume at: " + pos + " is " + volume);
         for (Direction direction : TickedPseudoRandom.getRandomDirectionArray()) {
             BlockPos offset = owner.relative(direction);
             int otherVolume = region.getVolume(offset);
             if (otherVolume < 0) continue;
 
-            int transfer = (otherVolume - volume) / 2;
+            int transfer = (otherVolume - volume) / 8;
             if (transfer > 1 || transfer < -1) {
                 region.setVolume(offset, otherVolume - transfer);
                 region.setVolume(owner, volume + transfer);
+                volume += transfer;
             }
         }
     }
