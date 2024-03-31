@@ -138,7 +138,6 @@ public class FluidSection implements ExtraSectionStorage {
         }
     }
 
-
     public void setWaterVolumeByState(BlockPos pos, BlockState state) {
         setWaterVolumeByState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, state);
     }
