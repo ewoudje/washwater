@@ -49,7 +49,14 @@ public class FluidTicker {
             LongSet activeChunks = new LongOpenHashSet();
             ActiveChunks.getActiveChunks(level, activeChunks);
 
-            var region = regions.computeIfAbsent(level, SimpleFluidRegion::new);
+            var region = regions.computeIfAbsent(level, level1 -> new SimpleFluidRegion(level1, l -> {
+                int x = BlockPos.getX(l);
+                int y = BlockPos.getY(l);
+                int z = BlockPos.getZ(l);
+                if (FluidManager.getVolume(level, x, y, z) > 0) {
+                    getCurrentWaterList(level).add(BlockPos.asLong(x, y, z));
+                }
+            }));
             var pair = waters.get(level);
             if (pair == null) return;
 

@@ -56,7 +56,7 @@ public class FluidManager {
 
         if (volume != 0) {
             FluidTicker.tickWater(level, x, y, z);
-            for (var direction : Direction.values()) {
+            for (var direction : new Direction[] {Direction.UP, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.WEST}) {
                 FluidTicker.tickIfWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
             }
         }

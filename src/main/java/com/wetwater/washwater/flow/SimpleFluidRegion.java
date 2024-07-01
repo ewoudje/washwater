@@ -5,6 +5,8 @@ import com.wetwater.washwater.FluidSection;
 import com.wetwater.washwater.scheduling.FluidTicker;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongConsumer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
@@ -12,9 +14,11 @@ import net.minecraft.server.level.ServerLevel;
 public class SimpleFluidRegion implements FluidRegion {
     private final Long2ObjectMap<FluidSection> sections = new Long2ObjectOpenHashMap<>();
     private final ServerLevel level;
+    private final LongConsumer onUpdate;
 
-    public SimpleFluidRegion(ServerLevel level) {
+    public SimpleFluidRegion(ServerLevel level, LongConsumer onUpdate) {
         this.level = level;
+        this.onUpdate =  onUpdate;
     }
 
 
@@ -27,11 +31,11 @@ public class SimpleFluidRegion implements FluidRegion {
     public void setVolume(int x, int y, int z, int volume) {
         getSection(x, y, z).setWaterVolume(x & 15, y & 15, z & 15, (short) volume);
 
-        if (volume != 0) {
-            FluidTicker.tickWater(level, x, y, z);
-            for (Direction direction : Direction.values()) {
-                FluidTicker.tickIfWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
-            }
+        onUpdate.accept(BlockPos.asLong(x, y, z));
+        for (Direction direction : Direction.values()) {
+            onUpdate.accept(
+                    BlockPos.asLong(x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ())
+            );
         }
     }
 

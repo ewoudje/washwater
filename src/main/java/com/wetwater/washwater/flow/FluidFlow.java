@@ -21,7 +21,9 @@ public class FluidFlow {
                 region.setVolume(pos.getX(), pos.getY() - 1, pos.getZ(), underVolume + transaction);
 
                 volume -= transaction;
-            } else {
+            }
+
+            if (volume > 0) {
                 //If under is solid or filled up then flow to sides
                 equalizeWater(region, pos, volume);
             }

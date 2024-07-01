@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -52,8 +53,9 @@ public class FluidSection implements ExtraSectionStorage {
                 for (int z = 0; z < 16; z++) {
                     if (!section.getFluidState(x, y, z).isEmpty()) {
                         setWaterVolume(x, y, z, WaterInfo.volumePerBlock);
+                        section.setBlockState(x, y, z, Blocks.AIR.defaultBlockState());
                     } else {
-                        setWaterVolume(x, y, z, (short) (section.getBlockState(x, y, z).isAir() ? 0 : -1));
+                        setWaterVolume(x, y, z, (short) (section.getBlockState(x, y, z).getMaterial().isSolid() ? -1 : 0));
                     }
                 }
             }
