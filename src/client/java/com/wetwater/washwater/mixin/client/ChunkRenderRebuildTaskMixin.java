@@ -30,14 +30,22 @@ public class ChunkRenderRebuildTaskMixin {
     BlockState getBlockState(WorldSlice slice, int x, int y, int z) {
         BlockState state = slice.getBlockState(x,y,z);
         fluidVolume = FluidManager.getVolume(((WorldSliceAccessor) slice).getLevel(), x, y, z);
-        return state.isAir() && fluidVolume != -1 ? WaterInfo.getWaterState(fluidVolume).createLegacyBlock() : state;
+        return fluidVolume > 0 ? WaterInfo.getWaterState(fluidVolume).createLegacyBlock() : state;
+    }
+
+    @Redirect(
+            method = "performBuild",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getFluidState()Lnet/minecraft/world/level/material/FluidState;")
+    )
+    FluidState getFluidState(BlockState state) {
+        return WaterInfo.getWaterState(fluidVolume);
     }
 
     @Redirect(
             method = "performBuild",
             at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/pipeline/FluidRenderer;render(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lme/jellysquid/mods/sodium/client/render/chunk/compile/buffers/ChunkModelBuilder;)Z")
     )
-    boolean getFluidState(FluidRenderer instance, BlockAndTintGetter level, FluidState state, BlockPos pos, BlockPos rel, ChunkModelBuilder builder) {
+    boolean render(FluidRenderer instance, BlockAndTintGetter level, FluidState state, BlockPos pos, BlockPos rel, ChunkModelBuilder builder) {
         return WashFluidRenderer.getInstance(instance).render(((WorldSliceAccessor) level).getLevel(), pos, rel, builder, fluidVolume);
     }
 

@@ -32,6 +32,7 @@ public class FluidSection implements ExtraSectionStorage {
     private int dirtyCount = 0;
     private boolean anyDirt = false;
     private boolean isSavedDirty = false;
+    private int amountOfWaters = 0;
     private final LevelChunk chunk;
     private final int sectionIndex;
 
@@ -51,11 +52,11 @@ public class FluidSection implements ExtraSectionStorage {
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
-                    if (!section.getFluidState(x, y, z).isEmpty()) {
-                        setWaterVolume(x, y, z, WaterInfo.volumePerBlock);
+                    short amount = WaterInfo.getWaterVolumeOfState(section.getBlockState(x, y, z));
+                    setWaterVolume(x, y, z, amount);
+                    if (amount > 0) {
                         section.setBlockState(x, y, z, Blocks.AIR.defaultBlockState());
-                    } else {
-                        setWaterVolume(x, y, z, (short) (section.getBlockState(x, y, z).getMaterial().isSolid() ? -1 : 0));
+                        amountOfWaters++;
                     }
                 }
             }
@@ -74,6 +75,12 @@ public class FluidSection implements ExtraSectionStorage {
             dirty = new int[128]; // 16*16*16 / 32 = 128
             dirtyCount = 16*16*16;
             Arrays.fill(dirty, 0xFFFFFFFF);
+        }
+
+        for (short value : water) {
+            if (value >= 0) {
+                amountOfWaters++;
+            }
         }
     }
 
@@ -127,7 +134,14 @@ public class FluidSection implements ExtraSectionStorage {
 
     // relative coordinates
     public void setWaterVolume(int x, int y, int z, short value) {
-        water[(x*16*16) + (y * 16) + z] = value;
+        int index = (x*16*16) + (y * 16) + z;
+        if (water[index] <= 0)
+            amountOfWaters++;
+        else if (value == 0)
+            amountOfWaters--;
+
+        water[index] = value;
+
         isSavedDirty = true;
 
         if (dirty != null) {
@@ -212,6 +226,11 @@ public class FluidSection implements ExtraSectionStorage {
     @Override // Dirty for saving
     public boolean isDirty() {
         return isSavedDirty;
+    }
+
+    public boolean isEmpty() {
+        return false;
+        //TODO return amountOfWaters <= 0;
     }
 
     @Override

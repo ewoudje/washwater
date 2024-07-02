@@ -40,10 +40,6 @@ public class FluidManager {
     public static void setVolume(ServerLevel level, int x, int y, int z, int volume) {
         var chunk = level.getChunk(x >> 4, z >> 4);
         var section = chunk.getSections()[level.getSectionIndex(y)];
-        if (!section.getBlockState(x & 15, y & 15, z & 15).isAir()) {
-            WaterMod.LOGGER.warn("Tried to set water volume in non-air block");
-            return;
-        }
 
         FluidSection fSection = (FluidSection) ((ExtraStorageSectionContainer) section).getSectionStorage(FluidSection.ID);
 
@@ -56,18 +52,22 @@ public class FluidManager {
 
         if (volume != 0) {
             FluidTicker.tickWater(level, x, y, z);
-            for (var direction : new Direction[] {Direction.UP, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.WEST}) {
-                FluidTicker.tickIfWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
-            }
+        }
+
+        for (var direction : new Direction[] {Direction.UP, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.WEST}) {
+            FluidTicker.tickIfWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
         }
     }
 
     public static int getVolume(Level level, int x, int y, int z) {
         var section = level.getChunk(x >> 4, z >> 4).getSections()[level.getSectionIndex(y)];
-        if (!section.getBlockState(x & 15, y & 15, z & 15).isAir()) return -1;
+        var state = section.getBlockState(x & 15, y & 15, z & 15);
+        var volume = WaterInfo.getWaterVolumeOfState(state);
+        if (volume < 0) return volume;
 
         var fluidSection = (FluidSection) ((ExtraStorageSectionContainer) section).getSectionStorage(FluidSection.ID);
-        if (fluidSection == null) return 0;
+        if (fluidSection == null)
+            return volume;
 
         return fluidSection.getWaterVolume(x & 15, y & 15, z & 15);
     }

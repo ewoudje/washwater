@@ -13,19 +13,19 @@ public class WaterInfo {
     public static int flowDivider = 8;
 
     public static short getWaterVolumeOfState(BlockState state) {
-        if (state.isAir())
-            return 0;
+
 
         FluidState fluidstate = state.getFluidState();
-        if (fluidstate.isEmpty())
-            return -1;
-
-        return (short) (fluidstate.getAmount() * volumePerLevel);
+        if (fluidstate.isEmpty()) {
+            if (state.isAir() || !state.getMaterial().isSolid())
+                return 0;
+            else
+                return -1;
+        } else return (short) (fluidstate.getAmount() * volumePerLevel);
     }
 
     public static FluidState getWaterState(int value) {
-        //TODO if -1 we want to check state?
-        if (value == 0 || value == Short.MIN_VALUE || value == -1) return Fluids.EMPTY.defaultFluidState();
+        if (value <= 0) return Fluids.EMPTY.defaultFluidState();
         //return Fluids.WATER.getFlowing(value / volumePerLevel + 1, false);
         //System.out.println("amogus returned water");
         //return Fluids.WATER.getFlowing(8, false);
