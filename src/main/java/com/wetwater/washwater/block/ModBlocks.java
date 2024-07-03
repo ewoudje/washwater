@@ -33,7 +33,7 @@ public class ModBlocks {
     }
 
     public static void RegisterModBlocks() {
-        WaterMod.LOGGER.info("Registering ModBlocks for" + WaterMod.MODID);
+        WaterMod.LOGGER.info("Registering ModBlocks for " + WaterMod.MODID);
     }
 
 }

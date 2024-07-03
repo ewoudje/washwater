@@ -2,6 +2,7 @@ package com.wetwater.washwater;
 
 import com.wetwater.washwater.block.ModBlocks;
 import com.wetwater.washwater.block.entity.ModBlockEntities;
+import com.wetwater.washwater.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +17,7 @@ public class WaterMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		FluidSection.register();
+		ModItems.RegisterModItems();
 		ModBlocks.RegisterModBlocks();
 		ModBlockEntities.registerAllBlockEntities();
 	}
