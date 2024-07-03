@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,12 @@ public class FluidTicker {
 
     public static void tickIfWater(ServerLevel level, int x, int y, int z) {
         if (FluidManager.getVolume(level, x, y, z) > 0) {
+            getCurrentWaterList(level).add(BlockPos.asLong(x, y, z));
+        }
+    }
+
+    public static void tickIfWater(ServerLevel level, BlockState state, int x, int y, int z) {
+        if (FluidManager.getVolume(level, state, x, y, z) > 0) {
             getCurrentWaterList(level).add(BlockPos.asLong(x, y, z));
         }
     }

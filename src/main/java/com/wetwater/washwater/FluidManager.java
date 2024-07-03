@@ -2,10 +2,13 @@ package com.wetwater.washwater;
 
 import com.ewoudje.lasagna.chunkstorage.ExtraStorageSectionContainer;
 import com.wetwater.washwater.scheduling.FluidTicker;
+import com.wetwater.washwater.util.DirectionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 
 public class FluidManager {
 
@@ -54,14 +57,35 @@ public class FluidManager {
             FluidTicker.tickWater(level, x, y, z);
         }
 
-        for (var direction : new Direction[] {Direction.UP, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.WEST}) {
+        for (var direction : DirectionUtils.HORIZONTAL_TOP) {
             FluidTicker.tickIfWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
         }
     }
 
+    public static int getVolume(Level level, BlockState state, int x, int y, int z) {
+        return getVolume(
+                level.getChunk(x >> 4, z >> 4).getSections()[level.getSectionIndex(y)],
+                state,
+                x & 15, y & 15, z & 15
+        );
+    }
+
     public static int getVolume(Level level, int x, int y, int z) {
-        var section = level.getChunk(x >> 4, z >> 4).getSections()[level.getSectionIndex(y)];
-        var state = section.getBlockState(x & 15, y & 15, z & 15);
+       return getVolume(
+               level.getChunk(x >> 4, z >> 4).getSections()[level.getSectionIndex(y)],
+               x & 15, y & 15, z & 15
+       );
+    }
+
+    public static int getVolume(LevelChunkSection section, int x, int y, int z) {
+        return getVolume(
+                section,
+                section.getBlockState(x & 15, y & 15, z & 15),
+                x & 15, y & 15, z & 15
+        );
+    }
+
+    public static int getVolume(LevelChunkSection section, BlockState state, int x, int y, int z) {
         var volume = WaterInfo.getWaterVolumeOfState(state);
         if (volume < 0) return volume;
 
@@ -69,7 +93,7 @@ public class FluidManager {
         if (fluidSection == null)
             return volume;
 
-        return fluidSection.getWaterVolume(x & 15, y & 15, z & 15);
+        return fluidSection.getWaterVolume(x, y, z);
     }
 
 

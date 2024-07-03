@@ -8,8 +8,6 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
 public class ActiveChunks {

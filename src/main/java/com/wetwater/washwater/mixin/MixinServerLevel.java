@@ -2,7 +2,6 @@ package com.wetwater.washwater.mixin;
 
 import com.wetwater.washwater.FluidSection;
 import com.wetwater.washwater.WaterMod;
-import com.wetwater.washwater.flow.PseudoRandom;
 import com.wetwater.washwater.scheduling.FluidTicker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.function.BooleanSupplier;
 
 @Mixin(ServerLevel.class)
-public abstract class MixinServerLevel  {
+public abstract class MixinServerLevel {
 
     @Inject(at = @At("HEAD"), method = "tick", cancellable = true)
     public void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {

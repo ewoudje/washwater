@@ -5,6 +5,7 @@
   "mixins": [
     "ChunkMapAccessor",
     "MixinBucketItem",
+    "MixinLevel",
     "MixinLevelChunkSection",
     "MixinServerLevel"
   ],
