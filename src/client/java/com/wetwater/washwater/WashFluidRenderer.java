@@ -22,6 +22,7 @@ import me.jellysquid.mods.sodium.common.util.DirectionUtil;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
@@ -34,6 +35,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class WashFluidRenderer {
@@ -51,6 +54,7 @@ public class WashFluidRenderer {
     private final BlockPos.MutableBlockPos tmpPos = new BlockPos.MutableBlockPos();
 
     private final TextureAtlasSprite waterOverlaySprite;
+    private final TextureAtlasSprite puddle;
 
     private final ModelQuadViewMutable quad = new ModelQuad();
 
@@ -65,6 +69,7 @@ public class WashFluidRenderer {
 
     public WashFluidRenderer(LightPipelineProvider lighters, ColorBlender colorBlender) {
         this.waterOverlaySprite = ModelBakery.WATER_OVERLAY.sprite();
+        this.puddle = ModelBakery.LAVA_FLOW.sprite(); //TODO
 
         int normal = Norm3b.pack(0.0f, 1.0f, 0.0f);
         for (int i = 0; i < 4; i++) {
@@ -75,60 +80,61 @@ public class WashFluidRenderer {
         this.colorBlender = colorBlender;
     }
 
-    private boolean isFluidOccluded(BlockAndTintGetter level, int x, int y, int z, Direction dir, Fluid fluid) {
-        return false;
-        /*
+    private boolean isFluidOccluded(Level level, float height, int x, int y, int z, Direction dir) {
+        int otherVolume = FluidManager.getVolume(
+                level,
+                x + dir.getStepX(),
+                y + dir.getStepY(),
+                z + dir.getStepZ()
+        );
+        if (dir == Direction.UP && otherVolume > 0) return true;
+        if (dir == Direction.DOWN && otherVolume != WaterInfo.volumePerBlock) return false;
 
-        BlockPos pos = this.scratchPos.set(x, y, z);
-        BlockState blockState = level.getBlockState(pos);
-        BlockPos adjPos = this.scratchPos.set(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
+        float otherHeight = WaterInfo.getHeight(otherVolume);
 
-        if (blockState.isOpaque()) {
-            return level.getFluidState(adjPos).getFluid().matchesType(fluid) || blockState.isSideSolid(level,pos,dir, SideShapeType.FULL);
-            // fluidlogged or next to water, occlude sides that are solid or the same liquid
-        }
-        return level.getFluidState(adjPos).getFluid().matchesType(fluid);*/
+        return otherHeight > 0;
     }
 
     private boolean isSideExposed(BlockAndTintGetter world, int x, int y, int z, Direction dir, float height) {
-        /*
-        BlockPos pos = this.scratchPos.set(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-        BlockState blockState = level.getBlockState(pos);
+        BlockPos pos = this.tmpPos.set(x + dir.getStepX(), y + dir.getStepY(), z + dir.getStepZ());
+        BlockState blockState = world.getBlockState(pos);
 
-        if (blockState.isOpaque()) {
-            VoxelShape shape = blockState.getCullingShape(level, pos);
+        if (blockState.canOcclude()) {
+            VoxelShape shape = blockState.getOcclusionShape(world, pos);
 
             // Hoist these checks to avoid allocating the shape below
-            if (shape == VoxelShapes.fullCube()) {
+            if (shape == Shapes.block()) {
                 // The top face always be inset, so if the shape above is a full cube it can't possibly occlude
                 return dir == Direction.UP;
             } else if (shape.isEmpty()) {
                 return true;
             }
 
-            VoxelShape threshold = VoxelShapes.cuboid(0.0D, 0.0D, 0.0D, 1.0D, height, 1.0D);
+            VoxelShape threshold = Shapes.box(0.0D, 0.0D, 0.0D, 1.0D, height, 1.0D);
 
-            return !VoxelShapes.isSideCovered(threshold, shape, dir);
-        }*/
+            return !Shapes.blockOccudes(threshold, shape, dir);
+        }
 
         return true;
     }
 
     public boolean render(Level level, BlockPos pos, BlockPos offset, ChunkModelBuilder buffers, int volume) {
+        if (volume <= WaterInfo.surfaceTensionLimit) return renderPuddle(level, pos, offset, buffers, volume);
+
         int posX = pos.getX();
         int posY = pos.getY();
         int posZ = pos.getZ();
+        float height = WaterInfo.getHeight(volume);
 
         FluidState fluidState = Fluids.WATER.defaultFluidState();
-        Fluid fluid = fluidState.getType();
 
-        boolean sfUp = this.isFluidOccluded(level, posX, posY, posZ, Direction.UP, fluid);
-        boolean sfDown = this.isFluidOccluded(level, posX, posY, posZ, Direction.DOWN, fluid) ||
+        boolean sfUp = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.UP);
+        boolean sfDown = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.DOWN) ||
                 !this.isSideExposed(level, posX, posY, posZ, Direction.DOWN, 0.8888889F);
-        boolean sfNorth = this.isFluidOccluded(level, posX, posY, posZ, Direction.NORTH, fluid);
-        boolean sfSouth = this.isFluidOccluded(level, posX, posY, posZ, Direction.SOUTH, fluid);
-        boolean sfWest = this.isFluidOccluded(level, posX, posY, posZ, Direction.WEST, fluid);
-        boolean sfEast = this.isFluidOccluded(level, posX, posY, posZ, Direction.EAST, fluid);
+        boolean sfNorth = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.NORTH);
+        boolean sfSouth = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.SOUTH);
+        boolean sfWest = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.WEST);
+        boolean sfEast = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.EAST);
 
         if (sfUp && sfDown && sfEast && sfWest && sfNorth && sfSouth) {
             return false;
@@ -143,17 +149,40 @@ public class WashFluidRenderer {
 
         boolean rendered = false;
 
-        float height = WaterInfo.getHeight(volume);
+
         if (height <= 0.0f) {
             WaterMod.LOGGER.warn("Rendering water with no or less volume");
         } else if (height > 1.0f) {
             WaterMod.LOGGER.warn("Rendering water with more then max volume");
         }
 
-        float h1 = height;
-        float h2 = height;
-        float h3 = height;
-        float h4 = height;
+        int topLeft = FluidManager.getVolume(level, posX - 1, posY, posZ + 1);
+        int topRight = FluidManager.getVolume(level, posX + 1, posY, posZ + 1);
+        int bottomLeft = FluidManager.getVolume(level, posX - 1, posY, posZ - 1);
+        int bottomRight = FluidManager.getVolume(level, posX + 1, posY, posZ - 1);
+        int left = FluidManager.getVolume(level, posX - 1, posY, posZ);
+        int right = FluidManager.getVolume(level, posX + 1, posY, posZ);
+        int top = FluidManager.getVolume(level, posX, posY, posZ + 1);
+        int bottom = FluidManager.getVolume(level, posX, posY, posZ - 1);
+
+        int h1Divider = 4;
+        int h2Divider = 4;
+        int h3Divider = 4;
+        int h4Divider = 4;
+
+        if (bottomLeft <= 0.1) { h1Divider--; }
+        if (topLeft <= 0.1) { h2Divider--; }
+        if (topRight <= 0.1) { h3Divider--; }
+        if (bottomRight <= 0.1) { h4Divider--; }
+        if (left <= 0.1) { h1Divider--; h2Divider--; }
+        if (right <= 0.1) { h3Divider--; h4Divider--; }
+        if (top <= 0.1) { h3Divider--; h2Divider--; }
+        if (bottom <= 0.1) { h1Divider--; h4Divider--; }
+
+        float h1 = WaterInfo.getHeight((volume + bottomLeft + bottom + left) / h1Divider);
+        float h2 = WaterInfo.getHeight((volume + topLeft + top + left) / h2Divider);
+        float h3 = WaterInfo.getHeight((volume + topRight + top + right) / h3Divider);
+        float h4 = WaterInfo.getHeight((volume + bottomRight + bottom + right) / h4Divider);
 
         float yOffset = sfDown ? 0.0F : EPSILON;
 
@@ -226,7 +255,7 @@ public class WashFluidRenderer {
             this.setVertex(quad, 2, 1.0F, h3, 1.0F, u3, v3);
             this.setVertex(quad, 3, 1.0F, h4, 0.0f, u4, v4);
 
-            this.calculateQuadColors(quad, level, pos, lighter, Direction.UP, 1.0F, null, fluidState);
+            this.calculateQuadColors(quad, level, pos, lighter, Direction.UP, 1.0F, fabricColorProviderAdapter, fluidState);
 
             int vertexStart = this.writeVertices(buffers, offset, quad);
 
@@ -255,7 +284,7 @@ public class WashFluidRenderer {
             this.setVertex(quad, 2, 1.0F, yOffset, 0.0f, maxU, minV);
             this.setVertex(quad, 3, 1.0F, yOffset, 1.0F, maxU, maxV);
 
-            this.calculateQuadColors(quad, level, pos, lighter, Direction.DOWN, 1.0F, null, fluidState);
+            this.calculateQuadColors(quad, level, pos, lighter, Direction.DOWN, 1.0F, fabricColorProviderAdapter, fluidState);
 
             int vertexStart = this.writeVertices(buffers, offset, quad);
 
@@ -364,7 +393,7 @@ public class WashFluidRenderer {
 
                 ModelQuadFacing facing = ModelQuadFacing.fromDirection(dir);
 
-                this.calculateQuadColors(quad, level, pos, lighter, dir, br, null, fluidState);
+                this.calculateQuadColors(quad, level, pos, lighter, dir, br, fabricColorProviderAdapter, fluidState);
 
                 int vertexStart = this.writeVertices(buffers, offset, quad);
 
@@ -383,6 +412,31 @@ public class WashFluidRenderer {
         return rendered;
     }
 
+    private boolean renderPuddle(Level level, BlockPos pos, BlockPos offset, ChunkModelBuilder buffers, int volume) {
+        TextureAtlasSprite sprite = this.puddle;
+        quad.setSprite(sprite);
+        LightMode lightMode = Minecraft.useAmbientOcclusion() ? LightMode.SMOOTH : LightMode.FLAT;
+        LightPipeline lighter = this.lighters.getLighter(lightMode);
+        this.calculateQuadColors(quad, level, pos, lighter, Direction.UP, 1.0F, fabricColorProviderAdapter, WaterInfo.getWaterState(volume));
+
+        float u1 = sprite.getU(0.0D);
+        float u2 = sprite.getU(16.0D);
+        float v1 = sprite.getV(0.0D);
+        float v2 = sprite.getV(16.0D);
+
+
+        this.setVertex(quad, 0, 0.0f, 0.001f, 0.0f, u1, v1);
+        this.setVertex(quad, 1, 0.0f, 0.001f, 1.0F, u1, v2);
+        this.setVertex(quad, 2, 1.0F, 0.001f, 1.0F, u2, v2);
+        this.setVertex(quad, 3, 1.0F, 0.001f, 0.0f, u2, v1);
+
+        int vertexStart = this.writeVertices(buffers, offset, quad);
+        buffers.getIndexBufferBuilder(ModelQuadFacing.UP)
+                .add(vertexStart, ModelQuadWinding.CLOCKWISE);
+
+        return true;
+    }
+
     private ColorSampler<FluidState> createColorProviderAdapter(FluidRenderHandler handler) {
         FabricFluidColorizerAdapter adapter = this.fabricColorProviderAdapter;
         adapter.setHandler(handler);
@@ -392,16 +446,12 @@ public class WashFluidRenderer {
 
     private void calculateQuadColors(ModelQuadView quad, BlockAndTintGetter level, BlockPos pos, LightPipeline lighter, Direction dir, float brightness,
                                      ColorSampler<FluidState> colorSampler, FluidState fluidState) {
-        //QuadLightData light = this.quadLightData;
-        //lighter.calculate(quad, pos, light, dir, false);
-/*
-        int[] biomeColors = this.colorBlender.getColors(level, pos, quad, colorSampler, fluidState);
+        //lighter.calculate(quad, pos, quadLightData, dir, false);
+
+        //int[] biomeColors = this.colorBlender.getColors(level, pos, quad, colorSampler, fluidState);
 
         for (int i = 0; i < 4; i++) {
-            this.quadColors[i] = ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, light.br[i] * brightness);
-        }*/
-        for (int i = 0; i < 4; i++) {
-            this.quadColors[i] = ColorABGR.mul(0xFFFFFFFF, brightness);
+            this.quadColors[i] = 0xFFFFFFFF;//ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, quadLightData.br[i] * brightness);
         }
     }
 
@@ -443,44 +493,6 @@ public class WashFluidRenderer {
         quad.setZ(i, z);
         quad.setTexU(i, u);
         quad.setTexV(i, v);
-    }
-
-    private float getCornerHeight(BlockAndTintGetter world, int x, int y, int z, Fluid fluid) {
-        /*
-        int samples = 0;
-        float totalHeight = 0.0F;
-
-        for (int i = 0; i < 4; ++i) {
-            int x2 = x - (i & 1);
-            int z2 = z - (i >> 1 & 1);
-
-            if (level.getFluidState(this.scratchPos.set(x2, y + 1, z2)).getFluid().matchesType(fluid)) {
-                return 1.0F;
-            }
-
-            BlockPos pos = this.scratchPos.set(x2, y, z2);
-
-            BlockState blockState = level.getBlockState(pos);
-            FluidState fluidState = blockState.getFluidState();
-
-            if (fluidState.getFluid().matchesType(fluid)) {
-                float height = fluidState.getHeight(level, pos);
-
-                if (height >= 0.8F) {
-                    totalHeight += height * 10.0F;
-                    samples += 10;
-                } else {
-                    totalHeight += height;
-                    ++samples;
-                }
-            } else if (!blockState.getMaterial().isSolid()) {
-                ++samples;
-            }
-        }
-
-        return totalHeight / (float) samples;
-        */
-        return 0.9f;
     }
 
     private static class FabricFluidColorizerAdapter implements ColorSampler<FluidState> {
