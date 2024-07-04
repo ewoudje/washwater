@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 //TODO more fluid supports
-public class FluidSection implements ExtraSectionStorage {
+public class FluidSection implements ExtraSectionStorage, {
     public static final ResourceLocation ID = WaterMod.resource("water");
     public static final List<FluidSection> dirtySections = new ArrayList<>();
     private final short[] water = new short[16*16*16];

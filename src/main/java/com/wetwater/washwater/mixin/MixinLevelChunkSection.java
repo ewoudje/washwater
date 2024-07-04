@@ -29,5 +29,6 @@ public class MixinLevelChunkSection {
     @ModifyReturnValue(at = @At("RETURN"), method = "hasOnlyAir")
     public boolean hasOnlyAir(boolean original) {
         return original && (fluidSection == null || fluidSection.isEmpty());
+        //return false;
     }
 }
