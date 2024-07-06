@@ -3,7 +3,9 @@ package com.wetwater.washwater.item;
 import com.ewoudje.lasagna.chunkstorage.ExtraStorageSectionContainer;
 import com.wetwater.washwater.FluidManager;
 import com.wetwater.washwater.FluidSection;
+import com.wetwater.washwater.FluidSectionContainer;
 import com.wetwater.washwater.debug.DebugUtils;
+import com.wetwater.washwater.mixin.MixinLevelChunkSection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -63,12 +66,15 @@ public class BucketMechanics {
             Direction direction = blockHitResult.getDirection();
             BlockPos blockPos2 = blockPos.relative(direction);
             LevelChunk chunk = level.getChunk(blockPos2.getX(), blockPos2.getZ());
-            var section = chunk.getSections()[level.getSectionIndex(blockPos2.getY())];
+            LevelChunkSection section = chunk.getSections()[level.getSectionIndex(blockPos2.getY())];
             System.out.println("Section empty: " + section.hasOnlyAir());
             boolean isNull = DebugUtils.debugMethodCheckNullSection((ServerLevel) level, blockPos2.getX(), blockPos2.getY(), blockPos2.getZ());
             System.out.println("Fsection null: " + isNull);
-            boolean isEmpty = DebugUtils.debugMethodCheckEmptySection((ServerLevel) level, blockPos2.getX(), blockPos2.getY(), blockPos2.getZ());
-            System.out.println("Fsection empty: " + isEmpty);
+            //boolean isEmpty = DebugUtils.debugMethodCheckEmptySection((ServerLevel) level, blockPos2.getX(), blockPos2.getY(), blockPos2.getZ());
+            //System.out.println("Fsection empty: " + isEmpty);
+            //((FluidSectionContainer)section).setFluidSection(new FluidSection(chunk, level.getSectionIndex(blockPos2.getY())));
+            FluidSection fluidSection2 = ((FluidSectionContainer)section).getFluidSection();
+            System.out.println("Fsection NEW check: " + fluidSection2.isEmpty());
         }
         return true;
     }
