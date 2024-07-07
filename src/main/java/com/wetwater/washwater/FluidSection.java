@@ -62,7 +62,7 @@ public class FluidSection implements ExtraSectionStorage {
         }
 
         isSavedDirty = true;
-        attachToSection(chunk, sectionIndex);
+        ((FluidSectionContainer) chunk.getSections()[sectionIndex]).setFluidSection(this);
     }
 
     private FluidSection(ShortBuffer shorts, @NotNull LevelChunk chunk, int sectionIndex) {
@@ -82,12 +82,8 @@ public class FluidSection implements ExtraSectionStorage {
                 amountOfWaters++;
             }
         }
-        attachToSection(chunk, sectionIndex);
-    }
 
-    private void attachToSection(LevelChunk chunk, int sectionIndex) {
-        var section = chunk.getSections()[sectionIndex];
-        ((FluidSectionContainer)section).setFluidSection(this);
+        ((FluidSectionContainer) chunk.getSections()[sectionIndex]).setFluidSection(this);
     }
 
     private byte[] makeBuffer() {
