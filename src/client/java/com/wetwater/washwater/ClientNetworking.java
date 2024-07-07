@@ -25,7 +25,7 @@ public class ClientNetworking {
 
             storage.applyDelta(packet);
 
-            ((LevelRendererAccessor) context.levelRenderer).iLoveItDirty(
+            ((LevelRendererAccessor) context.levelRenderer).invokeSetSectionDirty(
                     packet.chunkX,
                     context.level.getSectionYFromSectionIndex(packet.sectionY),
                     packet.chunkZ,

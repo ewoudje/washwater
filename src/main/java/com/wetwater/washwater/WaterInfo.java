@@ -33,7 +33,7 @@ public class WaterInfo {
     }
 
     public static float getHeight(int volume) {
-        if (volume == -1) return 0;
-        return (float) volume / volumePerBlock;
+        if (volume < 0) return 0;
+        return ((float) volume) / volumePerBlock;
     }
 }

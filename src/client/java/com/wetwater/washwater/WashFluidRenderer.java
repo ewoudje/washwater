@@ -119,7 +119,8 @@ public class WashFluidRenderer {
     }
 
     public boolean render(Level level, BlockPos pos, BlockPos offset, ChunkModelBuilder buffers, int volume) {
-        if (volume <= WaterInfo.surfaceTensionLimit) return renderPuddle(level, pos, offset, buffers, volume);
+        if (volume <= WaterInfo.surfaceTensionLimit && FluidManager.getVolume(level, pos.below()) < 0)
+            return renderPuddle(level, pos, offset, buffers, volume);
 
         int posX = pos.getX();
         int posY = pos.getY();
@@ -150,10 +151,11 @@ public class WashFluidRenderer {
         boolean rendered = false;
 
 
-        if (height <= 0.0f) {
+        if (height < EPSILON) {
             WaterMod.LOGGER.warn("Rendering water with no or less volume");
-        } else if (height > 1.0f) {
-            WaterMod.LOGGER.warn("Rendering water with more then max volume");
+        } else if (height > (1.0f + EPSILON)) {
+            //TODO happens allot why?
+            // WaterMod.LOGGER.warn("Rendering water with more then max volume");
         }
 
         int topLeft = FluidManager.getVolume(level, posX - 1, posY, posZ + 1);

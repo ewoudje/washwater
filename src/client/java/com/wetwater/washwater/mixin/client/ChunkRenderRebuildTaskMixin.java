@@ -18,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ChunkRenderRebuildTask.class)
 public class ChunkRenderRebuildTaskMixin {
-
-
     @Unique
     private int fluidVolume = 0;
 
@@ -30,7 +28,7 @@ public class ChunkRenderRebuildTaskMixin {
     BlockState getBlockState(WorldSlice slice, int x, int y, int z) {
         BlockState state = slice.getBlockState(x,y,z);
         fluidVolume = FluidManager.getVolume(((WorldSliceAccessor) slice).getLevel(), x, y, z);
-        return fluidVolume > 0 ? WaterInfo.getWaterState(fluidVolume).createLegacyBlock() : state;
+        return fluidVolume > 0 && state.isAir() ? WaterInfo.getWaterState(fluidVolume).createLegacyBlock() : state;
     }
 
     @Redirect(

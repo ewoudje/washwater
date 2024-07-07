@@ -30,9 +30,6 @@ public class MixinLevelChunkSection implements FluidSectionContainer {
 
     @Inject(at = @At("HEAD"), method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;")
     public void setBlockState(int x, int y, int z, BlockState state, boolean lock, CallbackInfoReturnable<BlockState> cir) {
-        if (fluidSection == null) //TODO we should make this smarter, just set the section when configuring the watersection
-            fluidSection = (FluidSection) ((ExtraStorageSectionContainer) this).getSectionStorage(FluidSection.ID);
-
         if (fluidSection != null)
             fluidSection.setWaterVolumeByState(x, y, z, state);
     }
