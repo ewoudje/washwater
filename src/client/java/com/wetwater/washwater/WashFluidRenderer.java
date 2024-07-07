@@ -144,7 +144,7 @@ public class WashFluidRenderer {
         boolean isWater = fluidState.is(FluidTags.WATER);
 
         FluidRenderHandler handler = FluidRenderHandlerRegistryImpl.INSTANCE.get(fluidState.getType());
-        //ColorSampler<FluidState> colorizer = this.createColorProviderAdapter(handler);
+        ColorSampler<FluidState> colorizer = this.createColorProviderAdapter(handler);
 
         TextureAtlasSprite[] sprites = handler.getFluidSprites(level, pos, fluidState);
 
@@ -448,12 +448,16 @@ public class WashFluidRenderer {
 
     private void calculateQuadColors(ModelQuadView quad, BlockAndTintGetter level, BlockPos pos, LightPipeline lighter, Direction dir, float brightness,
                                      ColorSampler<FluidState> colorSampler, FluidState fluidState) {
-        //lighter.calculate(quad, pos, quadLightData, dir, false);
+        try {
+            lighter.calculate(quad, pos, quadLightData, dir, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        //int[] biomeColors = this.colorBlender.getColors(level, pos, quad, colorSampler, fluidState);
+        int[] biomeColors = this.colorBlender.getColors(level, pos, quad, colorSampler, fluidState);
 
         for (int i = 0; i < 4; i++) {
-            this.quadColors[i] = 0xFFFFFFFF;//ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, quadLightData.br[i] * brightness);
+            this.quadColors[i] = ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, 1f);
         }
     }
 
@@ -473,7 +477,7 @@ public class WashFluidRenderer {
             float u = quad.getTexU(i);
             float v = quad.getTexV(i);
 
-            int light = 15;//this.quadLightData.lm[i];
+            int light = this.quadLightData.lm[i];
 
             vertices.writeVertex(offset, x, y, z, color, u, v, light, builder.getChunkId());
         }

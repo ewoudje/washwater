@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.wetwater.washwater.FluidSection;
 import com.wetwater.washwater.FluidSectionContainer;
+import com.wetwater.washwater.WaterInfo;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,6 +34,13 @@ public class MixinLevelChunkSection implements FluidSectionContainer {
         if (fluidSection != null)
             fluidSection.setWaterVolumeByState(x, y, z, state);
     }
+
+    @Inject(at = @At("RETURN"), method = "getBlockState")
+    public void getBlockstate(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
+        if (fluidSection != null && cir.getReturnValue().isAir())
+            cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)).createLegacyBlock());
+    }
+
 
     @ModifyReturnValue(at = @At("RETURN"), method = "hasOnlyAir")
     public boolean hasOnlyAir(boolean original) {
