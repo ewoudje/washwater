@@ -65,16 +65,18 @@ public class BucketMechanics {
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
             BlockPos blockPos2 = blockPos.relative(direction);
-            LevelChunk chunk = level.getChunk(blockPos2.getX(), blockPos2.getZ());
+            System.out.println("blockpos is: " + blockPos2);
+            LevelChunk chunk = level.getChunk(blockPos2.getX() >> 4, blockPos2.getZ() >> 4);
             LevelChunkSection section = chunk.getSections()[level.getSectionIndex(blockPos2.getY())];
-            System.out.println("Section empty: " + section.hasOnlyAir());
+            boolean hasOnlyAir = section.hasOnlyAir();
+            System.out.println("Section empty: " + hasOnlyAir);
             boolean isNull = DebugUtils.debugMethodCheckNullSection((ServerLevel) level, blockPos2.getX(), blockPos2.getY(), blockPos2.getZ());
             System.out.println("Fsection null: " + isNull);
             //boolean isEmpty = DebugUtils.debugMethodCheckEmptySection((ServerLevel) level, blockPos2.getX(), blockPos2.getY(), blockPos2.getZ());
             //System.out.println("Fsection empty: " + isEmpty);
             //((FluidSectionContainer)section).setFluidSection(new FluidSection(chunk, level.getSectionIndex(blockPos2.getY())));
             FluidSection fluidSection2 = ((FluidSectionContainer)section).getFluidSection();
-            System.out.println("Fsection NEW check: " + fluidSection2.isEmpty());
+            System.out.println("Fsection NEW check: " + (fluidSection2 == null));
         }
         return true;
     }

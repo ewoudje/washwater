@@ -20,7 +20,7 @@ public class MixinLevelChunkSection implements FluidSectionContainer {
 
     @Unique
     public FluidSection getFluidSection() {
-        return fluidSection;
+        return this.fluidSection;
     }
 
     @Unique

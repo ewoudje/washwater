@@ -27,8 +27,8 @@ public class FluidPipetteItem extends Item {
             }
             else {
                 //System.out.println("Picked up Water with Pipette");
-                //BucketMechanics.creativePipettePickup(level, targetPos, itemStack, player);
-                BucketMechanics.pipetteDebug(level, targetPos, itemStack, player);
+                BucketMechanics.creativePipettePickup(level, targetPos, itemStack, player);
+                //BucketMechanics.pipetteDebug(level, targetPos, itemStack, player);
             }
 
         }

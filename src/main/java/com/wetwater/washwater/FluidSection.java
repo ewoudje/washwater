@@ -63,6 +63,7 @@ public class FluidSection implements ExtraSectionStorage {
         }
 
         isSavedDirty = true;
+        leechOntoSection(chunk, sectionIndex);
     }
 
     private FluidSection(ShortBuffer shorts, @NotNull LevelChunk chunk, int sectionIndex) {
@@ -82,6 +83,12 @@ public class FluidSection implements ExtraSectionStorage {
                 amountOfWaters++;
             }
         }
+        leechOntoSection(chunk, sectionIndex);
+    }
+
+    private void leechOntoSection(LevelChunk chunk, int sectionIndex) {
+        var section = chunk.getSections()[sectionIndex];
+        ((FluidSectionContainer)section).setFluidSection(this);
     }
 
     private byte[] makeBuffer() {
