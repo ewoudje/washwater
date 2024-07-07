@@ -4,6 +4,7 @@ import com.ewoudje.lasagna.chunkstorage.ExtraStorageSectionContainer;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.wetwater.washwater.FluidSection;
+import com.wetwater.washwater.FluidSectionContainer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LevelChunkSection.class)
-public class MixinLevelChunkSection {
+public class MixinLevelChunkSection implements FluidSectionContainer {
     @Unique
     private FluidSection fluidSection;
 
