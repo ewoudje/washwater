@@ -17,6 +17,16 @@ public class MixinLevelChunkSection {
     @Unique
     private FluidSection fluidSection;
 
+    @Unique
+    public FluidSection getFluidSection() {
+        return this.fluidSection;
+    }
+
+    @Unique
+    public void setFluidSection(FluidSection fSection) {
+        this.fluidSection = fSection;
+    }
+
     @Inject(at = @At("HEAD"), method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;")
     public void setBlockState(int x, int y, int z, BlockState state, boolean lock, CallbackInfoReturnable<BlockState> cir) {
         if (fluidSection == null) //TODO we should make this smarter, just set the section when configuring the watersection

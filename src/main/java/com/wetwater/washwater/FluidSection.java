@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -63,6 +62,7 @@ public class FluidSection implements ExtraSectionStorage {
         }
 
         isSavedDirty = true;
+        attachToSection(chunk, sectionIndex);
     }
 
     private FluidSection(ShortBuffer shorts, @NotNull LevelChunk chunk, int sectionIndex) {
@@ -82,6 +82,12 @@ public class FluidSection implements ExtraSectionStorage {
                 amountOfWaters++;
             }
         }
+        attachToSection(chunk, sectionIndex);
+    }
+
+    private void attachToSection(LevelChunk chunk, int sectionIndex) {
+        var section = chunk.getSections()[sectionIndex];
+        ((FluidSectionContainer)section).setFluidSection(this);
     }
 
     private byte[] makeBuffer() {
