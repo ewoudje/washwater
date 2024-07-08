@@ -41,7 +41,6 @@ public class MixinLevelChunkSection implements FluidSectionContainer {
             cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)).createLegacyBlock());
     }
 
-
     @ModifyReturnValue(at = @At("RETURN"), method = "hasOnlyAir")
     public boolean hasOnlyAir(boolean original) {
         return original && (fluidSection == null || fluidSection.isEmpty());

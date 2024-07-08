@@ -6,6 +6,7 @@ import com.ewoudje.lasagna.networking.LasagnaNetworking;
 import com.ewoudje.lasagna.networking.TrackingChunkPacketTarget;
 import com.wetwater.washwater.packets.DeltaFluidSectionPacket;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -147,6 +148,8 @@ public class FluidSection implements ExtraSectionStorage {
         isSavedDirty = true;
 
         if (dirty != null) {
+            //TODO make dirtyCount only count if changed + remove anyDirt
+
             dirty[x * 8 + y / 2] |= 1 << (z + ((y % 4) * 16));
             dirtyCount++;
             if (!anyDirt) {
@@ -196,13 +199,27 @@ public class FluidSection implements ExtraSectionStorage {
         dirtySections.clear();
     }
 
-    public void applyDelta(DeltaFluidSectionPacket packet) {
+    public void applyDelta(DeltaFluidSectionPacket packet, boolean[] border) {
         if (packet.positions == null) {
             ByteBuffer.wrap(packet.water).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(this.water);
         } else {
             for (int i = 0; i < (packet.positions.length / 2); i++) {
                 if (packet.positions[i * 2] == -1 && packet.positions[i * 2 + 1] == -1) break;
                 int position = (packet.positions[i * 2] & 0xFF) | ((packet.positions[(i * 2) + 1] & 0xFF) << 8);
+
+                if ((position & 0xF) == 0)
+                    border[Direction.NORTH.ordinal()] = true;
+                if ((position & 0xF) == 0xF)
+                    border[Direction.SOUTH.ordinal()] = true;
+                if ((position & 0xF0) == 0x0)
+                    border[Direction.DOWN.ordinal()] = true;
+                if ((position & 0xF0) == 0xF0)
+                    border[Direction.UP.ordinal()] = true;
+                if ((position & 0xF00) == 0x0)
+                    border[Direction.WEST.ordinal()] = true;
+                if ((position & 0xF00) == 0xF00)
+                    border[Direction.EAST.ordinal()] = true;
+
                 this.water[position] = (short) ((packet.water[i * 2] & 0xFF) | ((packet.water[(i * 2) + 1] & 0xFF) << 8));
             }
         }

@@ -5,6 +5,7 @@ import com.ewoudje.lasagna.networking.LasagnaNetworking;
 import com.wetwater.washwater.mixin.client.LevelRendererAccessor;
 import com.wetwater.washwater.packets.DeltaFluidSectionPacket;
 import kotlin.Unit;
+import net.minecraft.core.Direction;
 
 public class ClientNetworking {
 
@@ -23,7 +24,9 @@ public class ClientNetworking {
                 ((ExtraStorageSectionContainer) section).setSectionStorage(FluidSection.ID, storage);
             }
 
-            storage.applyDelta(packet);
+            boolean[] shouldUpdate = new boolean[6];
+
+            storage.applyDelta(packet, shouldUpdate);
 
             ((LevelRendererAccessor) context.levelRenderer).invokeSetSectionDirty(
                     packet.chunkX,
@@ -31,6 +34,20 @@ public class ClientNetworking {
                     packet.chunkZ,
                     true
             );
+
+            for (int i = 0; i < shouldUpdate.length; i++) {
+                if (shouldUpdate[i]) {
+                    Direction direction = Direction.values()[i];
+
+                    ((LevelRendererAccessor) context.levelRenderer).invokeSetSectionDirty(
+                            packet.chunkX + direction.getStepX(),
+                            context.level.getSectionYFromSectionIndex(packet.sectionY) + direction.getStepY(),
+                            packet.chunkZ + direction.getStepZ(),
+                            true
+                    );
+                }
+            }
+
             return Unit.INSTANCE;
         });
     }
