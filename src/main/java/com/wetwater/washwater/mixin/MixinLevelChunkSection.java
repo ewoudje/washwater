@@ -35,7 +35,7 @@ public class MixinLevelChunkSection implements FluidSectionContainer {
             fluidSection.setWaterVolumeByState(x, y, z, state);
     }
 
-    @Inject(at = @At("RETURN"), method = "getBlockState")
+    @Inject(at = @At("RETURN"), method = "getBlockState", cancellable = true)
     public void getBlockstate(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
         if (fluidSection != null && cir.getReturnValue().isAir())
             cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)).createLegacyBlock());
