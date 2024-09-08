@@ -20,14 +20,15 @@ public class FluidPipetteItem extends Item {
         Player player = useOnContext.getPlayer();
         ItemStack itemStack = useOnContext.getItemInHand();
         BlockPos targetPos = useOnContext.getClickedPos();
-        if (!level.isClientSide) {
+        if (true) {
             if (!player.isCrouching()) {
                 System.out.println("Placed Water with Pipette");
                 BucketMechanics.creativePipettePlace(level, targetPos, itemStack, player);
             }
             else {
                 System.out.println("Picked up Water with Pipette");
-                BucketMechanics.creativePipettePickup(level, targetPos, itemStack, player);
+                //BucketMechanics.creativePipettePickup(level, targetPos, itemStack, player);
+                BucketMechanics.creativePipetteDebug(level, targetPos, itemStack, player);
             }
 
         }

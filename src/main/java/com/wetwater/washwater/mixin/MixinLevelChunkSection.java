@@ -6,13 +6,19 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.wetwater.washwater.FluidSection;
 import com.wetwater.washwater.FluidSectionContainer;
 import com.wetwater.washwater.WaterInfo;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.function.Predicate;
 
 @Mixin(LevelChunkSection.class)
 public class MixinLevelChunkSection implements FluidSectionContainer {
@@ -36,10 +42,52 @@ public class MixinLevelChunkSection implements FluidSectionContainer {
     }
 
     @Inject(at = @At("RETURN"), method = "getBlockState", cancellable = true)
-    public void getBlockstate(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
-        if (fluidSection != null && cir.getReturnValue().isAir())
+    public void getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
+        if (fluidSection != null && cir.getReturnValue().isAir()) {
+
             cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)).createLegacyBlock());
+        }
+
     }
+
+    @Inject(at = @At("RETURN"), method = "getFluidState", cancellable = true)
+    public void getFluidState(int x, int y, int z, CallbackInfoReturnable<FluidState> cir) {
+        if (fluidSection != null && cir.getReturnValue().isEmpty()) {
+
+            cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
+        }
+
+    }
+    @Inject(at = @At("RETURN"), method = "maybeHas", cancellable = true)
+    public void maybeHas(Predicate<BlockState> predicate, CallbackInfoReturnable<Boolean> cir) {
+        //System.out.println("Test1");
+        if (fluidSection != null && !cir.getReturnValue()) {
+            //System.out.println("Test2");
+            if(predicate.test(Blocks.WATER.defaultBlockState())) {
+                //System.out.println("Test3");
+                cir.setReturnValue(!fluidSection.isEmpty());
+            }
+        }
+
+    }
+
+    /**
+     * @author
+     * @reason
+     */
+/*    @Overwrite
+    public boolean maybeHas(Predicate<BlockState> predicate) {
+        System.out.println("Test1");
+        if (fluidSection != null) {
+            System.out.println("Test2");
+            if (predicate.test(Blocks.WATER.defaultBlockState())) {
+                System.out.println("Test3");
+                return !fluidSection.isEmpty();
+            }
+        }
+        return false;
+    }*/
+
 
     @ModifyReturnValue(at = @At("RETURN"), method = "hasOnlyAir")
     public boolean hasOnlyAir(boolean original) {

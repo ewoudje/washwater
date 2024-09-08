@@ -14,6 +14,10 @@ repositories {
 	maven {
 		url = 'https://maven.valkyrienskies.org'
 	}
+	maven {
+		url = "https://maven.bawnorton.com/releases"
+	}
+
 }
 
 loom {
@@ -36,6 +40,8 @@ dependencies {
 
 	modImplementation "com.ewoudje:lasagna-fabric:${project.lasagna_version}"
 	modCompileOnly("curse.maven:sodium-394468:3669187")
+
+	include(implementation(annotationProcessor("com.bawnorton.mixinsquared:mixinsquared-fabric:0.2.0-beta.6")))
 }
 
 processResources {

@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -51,6 +52,26 @@ public class BucketMechanics {
         }
         return true;
     }
+
+    public static boolean creativePipetteDebug(Level level, BlockPos pos, ItemStack itemStack, Player player) {
+        if (!level.isClientSide) {
+            BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
+            BlockPos blockPos = blockHitResult.getBlockPos();
+            Direction direction = blockHitResult.getDirection();
+            BlockPos blockPos2 = blockPos.relative(direction);
+            System.out.println("serverside, block at pos: " + level.getBlockState(blockPos2).getBlock());
+        }
+        else {
+            BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
+            BlockPos blockPos = blockHitResult.getBlockPos();
+            Direction direction = blockHitResult.getDirection();
+            BlockPos blockPos2 = blockPos.relative(direction);
+            LevelAccessor levelAccessor;
+            System.out.println("clientside, block at pos: " + level.getBlockState(blockPos2).getBlock());
+        }
+        return true;
+    }
+
 
     protected static BlockHitResult getPlayerPOVHitResult(Level level, Player player, ClipContext.Fluid fluid) {
         float f = player.getXRot();

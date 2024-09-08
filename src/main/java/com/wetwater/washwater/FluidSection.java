@@ -33,7 +33,7 @@ public class FluidSection implements ExtraSectionStorage {
     private boolean anyDirt = false;
     private boolean isSavedDirty = false;
     private int amountOfWaters = 0;
-    private final LevelChunk chunk;
+    public final LevelChunk chunk;
     private final int sectionIndex;
 
     public FluidSection(LevelChunk chunk, int sectionIndex) {
