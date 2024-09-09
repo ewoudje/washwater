@@ -17,6 +17,10 @@ repositories {
 	maven {
 		url = "https://maven.bawnorton.com/releases"
 	}
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+	}
 
 }
 
@@ -40,6 +44,8 @@ dependencies {
 
 	modImplementation "com.ewoudje:lasagna-fabric:${project.lasagna_version}"
 	modCompileOnly("curse.maven:sodium-394468:3669187")
+	modCompileOnly("maven.modrinth:lithium:mc1.18.2-0.10.3")
+
 
 	include(implementation(annotationProcessor("com.bawnorton.mixinsquared:mixinsquared-fabric:0.2.0-beta.6")))
 }

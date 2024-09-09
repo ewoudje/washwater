@@ -7,11 +7,7 @@
     "MixinBucketItem",
     "MixinLevel",
     "MixinLevelChunkSection",
-    "MixinServerLevel",
-    "NavigationMixin",
-    "EntityMixin",
-    "WaterAnimalMixin",
-    "MixinSquaredChunkSection"
+    "MixinServerLevel"
   ],
   "injectors": {
     "defaultRequire": 1
