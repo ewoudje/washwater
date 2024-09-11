@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Block;
 public class ModItems {
 
     public static final Item FLUID_PIPETTE = registerItem("fluid_pipette", new FluidPipetteItem(new Item.Properties().tab(CreativeModeTab.TAB_COMBAT)));
+    public static final Item PRECISION_BUCKET = registerItem("precision_bucket", new PrecisionBucketItem(new Item.Properties().tab(CreativeModeTab.TAB_COMBAT)));
 
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registry.ITEM, new ResourceLocation(WaterMod.MODID, name), item);

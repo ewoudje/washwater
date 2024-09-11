@@ -1,8 +1,10 @@
 package com.wetwater.washwater.item;
 
 import com.wetwater.washwater.FluidManager;
+import com.wetwater.washwater.WaterInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -40,6 +42,52 @@ public class BucketMechanics {
             }
         return true;
     }
+
+    public static boolean precisionBucketPlace(Level level, BlockPos pos, ItemStack itemStack, Player player) {
+
+        int bucketFillLevel = itemStack.getTag().getInt("washwater:bucketFillLevel");
+        int newBucketFillLevel = 0;
+
+        if (bucketFillLevel > 0 && !level.isClientSide) {
+            BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
+            BlockPos blockPos = blockHitResult.getBlockPos();
+            Direction direction = blockHitResult.getDirection();
+            BlockPos blockPos2 = blockPos.relative(direction);
+            FluidManager.addVolume((ServerLevel) level, blockPos2, bucketFillLevel);
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("washwater:bucketFillLevel", newBucketFillLevel);
+            itemStack.setTag(tag);
+        }
+        return true;
+    }
+    public static boolean precisionBucketPickup(Level level, BlockPos pos, ItemStack itemStack, Player player) {
+        int bucketFillLevel = itemStack.getTag().getInt("washwater:bucketFillLevel");
+        int bucketRemainingSpace = WaterInfo.volumePerBlock - bucketFillLevel;
+        if (!level.isClientSide) {
+            BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
+            BlockPos blockPos = blockHitResult.getBlockPos();
+            Direction direction = blockHitResult.getDirection();
+            BlockPos blockPos2 = blockPos.relative(direction);
+            int oldVolume = FluidManager.getVolume(level, blockPos2);
+            int newVolume = 0;
+            int newBucketFillLevel;
+            //int newVolume = (oldVolume > bucketRemainingSpace) ? oldVolume - bucketRemainingSpace : 0;
+            if (oldVolume > bucketRemainingSpace) {
+                newVolume = oldVolume - bucketRemainingSpace;
+                newBucketFillLevel = WaterInfo.volumePerBlock;
+            }
+            else {
+                newBucketFillLevel = bucketFillLevel + oldVolume;
+            }
+            FluidManager.setVolume((ServerLevel) level, blockPos2,  newVolume);
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("washwater:bucketFillLevel", newBucketFillLevel);
+            itemStack.setTag(tag);
+        }
+        return true;
+    }
+
+
     public static boolean creativePipettePickup(Level level, BlockPos pos, ItemStack itemStack, Player player) {
         if (!level.isClientSide) {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
