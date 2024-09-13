@@ -34,11 +34,9 @@ public class PrecisionBucketItem extends Item {
         }
         if (player != null) {
             if (!player.isCrouching()) {
-                System.out.println("Placed Water with Bucket");
                 BucketMechanics.precisionBucketPlace(level, targetPos, itemStack, player);
             }
             else {
-                System.out.println("Picked up Water with Bucket");
                 BucketMechanics.precisionBucketPickup(level, targetPos, itemStack, player);
             }
         }

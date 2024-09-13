@@ -71,7 +71,6 @@ public class BucketMechanics {
             int oldVolume = FluidManager.getVolume(level, blockPos2);
             int newVolume = 0;
             int newBucketFillLevel;
-            //int newVolume = (oldVolume > bucketRemainingSpace) ? oldVolume - bucketRemainingSpace : 0;
             if (oldVolume > bucketRemainingSpace) {
                 newVolume = oldVolume - bucketRemainingSpace;
                 newBucketFillLevel = WaterInfo.volumePerBlock;
