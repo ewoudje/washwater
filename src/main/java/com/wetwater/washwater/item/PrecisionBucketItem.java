@@ -1,9 +1,11 @@
 package com.wetwater.washwater.item;
 
+import com.wetwater.washwater.WaterInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -50,5 +52,26 @@ public class PrecisionBucketItem extends Item {
             String toolTipText = "Bucket contains: " + bucketFillLevel + "l " + "of fluid";
             list.add(new TextComponent(toolTipText));
         }
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack itemStack) {
+        return true;
+    }
+
+    @Override
+    public int getBarColor(ItemStack itemStack) {
+        return Mth.color(56, 141, 252);
+    }
+
+    @Override
+    public int getBarWidth(ItemStack itemStack) {
+        if (itemStack.hasTag()) {
+            int fillLevel = itemStack.getTag().getInt("washwater:bucketFillLevel");
+            int maxFillLevel = WaterInfo.volumePerBlock;
+            float fraction = (float) fillLevel / (float) maxFillLevel;
+            return (int) (13f * fraction);
+        }
+        else return 0;
     }
 }
