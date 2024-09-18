@@ -1,7 +1,5 @@
 package com.wetwater.washwater;
 
-import com.wetwater.washwater.state.FakeBlockState;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -27,9 +25,6 @@ public class WaterInfo {
 
     public static FluidState getWaterState(int value) {
         if (value <= 0) return Fluids.EMPTY.defaultFluidState();
-        //return Fluids.WATER.getFlowing(value / volumePerLevel + 1, false);
-        //System.out.println("amogus returned water");
-        //return Fluids.WATER.getFlowing(8, false);
         return Fluids.WATER.defaultFluidState();
     }
 
