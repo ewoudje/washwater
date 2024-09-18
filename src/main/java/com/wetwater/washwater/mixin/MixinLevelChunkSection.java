@@ -1,8 +1,6 @@
 package com.wetwater.washwater.mixin;
 
-import com.ewoudje.lasagna.chunkstorage.ExtraStorageSectionContainer;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.wetwater.washwater.FluidSection;
 import com.wetwater.washwater.FluidSectionContainer;
 import com.wetwater.washwater.WaterInfo;
@@ -12,9 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -46,7 +42,6 @@ public class MixinLevelChunkSection implements FluidSectionContainer, BlockCount
     @Inject(at = @At("RETURN"), method = "getBlockState", cancellable = true)
     public void getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
         if (fluidSection != null && cir.getReturnValue().isAir()) {
-
             cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)).createLegacyBlock());
         }
 
@@ -55,7 +50,6 @@ public class MixinLevelChunkSection implements FluidSectionContainer, BlockCount
     @Inject(at = @At("RETURN"), method = "getFluidState", cancellable = true)
     public void getFluidState(int x, int y, int z, CallbackInfoReturnable<FluidState> cir) {
         if (fluidSection != null && cir.getReturnValue().isEmpty()) {
-
             cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
         }
 

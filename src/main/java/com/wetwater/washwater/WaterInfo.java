@@ -1,6 +1,7 @@
 package com.wetwater.washwater;
 
-import com.ewoudje.lasagna.chunkstorage.ExtraStorageSectionContainer;
+import com.wetwater.washwater.state.FakeBlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
