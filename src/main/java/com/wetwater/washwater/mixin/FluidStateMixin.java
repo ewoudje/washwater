@@ -1,6 +1,7 @@
 package com.wetwater.washwater.mixin;
 
 import com.wetwater.washwater.WaterInfo;
+import com.wetwater.washwater.state.WashWaterFluidState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.material.FluidState;
@@ -13,9 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static com.wetwater.washwater.WaterInfo.volumePerBlock;
 
-interface WashWaterFluidState {
-    short ww$getVolume();
-}
 
 @Mixin(FluidState.class)
 class FluidStateMixin implements WashWaterFluidState {
@@ -26,6 +24,12 @@ class FluidStateMixin implements WashWaterFluidState {
     @Unique
     public short ww$getVolume() {
         return ww$volume;
+    }
+
+    @Override
+    @Unique
+    public void ww$setVolume(short volume) {
+        ww$volume = volume;
     }
 
 /*    @Inject(at = @At("HEAD"), method = "getHeight", cancellable = true)
@@ -39,7 +43,6 @@ class FluidStateMixin implements WashWaterFluidState {
      */
     @Overwrite
     public float getHeight(BlockGetter blockGetter, BlockPos blockPos) {
-      System.out.println("did a thing");
         if (ww$volume <= 0) return 0;
         return ((float) ww$volume) / volumePerBlock;
     }

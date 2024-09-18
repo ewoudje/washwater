@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.wetwater.washwater.FluidSection;
 import com.wetwater.washwater.FluidSectionContainer;
 import com.wetwater.washwater.WaterInfo;
+import com.wetwater.washwater.state.WashWaterFluidState;
 import me.jellysquid.mods.lithium.common.block.BlockCountingSection;
 import me.jellysquid.mods.lithium.common.block.TrackedBlockStatePredicate;
 import net.minecraft.world.level.block.Blocks;
@@ -42,7 +43,14 @@ public class MixinLevelChunkSection implements FluidSectionContainer, BlockCount
     @Inject(at = @At("RETURN"), method = "getBlockState", cancellable = true)
     public void getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
         if (fluidSection != null && cir.getReturnValue().isAir()) {
-            cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)).createLegacyBlock());
+            FluidState testState = WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z));
+            WashWaterFluidState waterState = ((WashWaterFluidState)(Object)testState);
+            waterState.ww$setVolume(fluidSection.getWaterVolume(x, y, z));
+            if(waterState.ww$getVolume() > 0) {
+                //System.out.println(((WashWaterFluidState)(Object)testState).ww$getVolume());
+            }
+            cir.setReturnValue(((FluidState)(Object)waterState).createLegacyBlock());
+            //cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)).createLegacyBlock());
         }
 
     }
@@ -50,7 +58,14 @@ public class MixinLevelChunkSection implements FluidSectionContainer, BlockCount
     @Inject(at = @At("RETURN"), method = "getFluidState", cancellable = true)
     public void getFluidState(int x, int y, int z, CallbackInfoReturnable<FluidState> cir) {
         if (fluidSection != null && cir.getReturnValue().isEmpty()) {
-            cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
+            FluidState testState = WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z));
+            WashWaterFluidState waterState = ((WashWaterFluidState)(Object)testState);
+            waterState.ww$setVolume(fluidSection.getWaterVolume(x, y, z));
+            if(waterState.ww$getVolume() > 0) {
+                //System.out.println(((WashWaterFluidState)(Object)testState).ww$getVolume());
+            }
+            cir.setReturnValue(((FluidState)(Object)waterState));
+            //cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
         }
 
     }
