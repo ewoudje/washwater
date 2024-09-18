@@ -43,14 +43,9 @@ public class MixinLevelChunkSection implements FluidSectionContainer, BlockCount
     @Inject(at = @At("RETURN"), method = "getBlockState", cancellable = true)
     public void getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
         if (fluidSection != null && cir.getReturnValue().isAir()) {
-            FluidState testState = WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z));
-            WashWaterFluidState waterState = ((WashWaterFluidState)(Object)testState);
+            WashWaterFluidState waterState = ((WashWaterFluidState)(Object)WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
             waterState.ww$setVolume(fluidSection.getWaterVolume(x, y, z));
-            if(waterState.ww$getVolume() > 0) {
-                //System.out.println(((WashWaterFluidState)(Object)testState).ww$getVolume());
-            }
-            cir.setReturnValue(((FluidState)(Object)waterState).createLegacyBlock());
-            //cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)).createLegacyBlock());
+            cir.setReturnValue((((FluidState)(Object)waterState).createLegacyBlock()));
         }
 
     }
@@ -58,16 +53,10 @@ public class MixinLevelChunkSection implements FluidSectionContainer, BlockCount
     @Inject(at = @At("RETURN"), method = "getFluidState", cancellable = true)
     public void getFluidState(int x, int y, int z, CallbackInfoReturnable<FluidState> cir) {
         if (fluidSection != null && cir.getReturnValue().isEmpty()) {
-            FluidState testState = WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z));
-            WashWaterFluidState waterState = ((WashWaterFluidState)(Object)testState);
+            WashWaterFluidState waterState = ((WashWaterFluidState)(Object)WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
             waterState.ww$setVolume(fluidSection.getWaterVolume(x, y, z));
-            if(waterState.ww$getVolume() > 0) {
-                //System.out.println(((WashWaterFluidState)(Object)testState).ww$getVolume());
-            }
             cir.setReturnValue(((FluidState)(Object)waterState));
-            //cir.setReturnValue(WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
         }
-
     }
     @Inject(at = @At("RETURN"), method = "maybeHas", cancellable = true)
     public void maybeHas(Predicate<BlockState> predicate, CallbackInfoReturnable<Boolean> cir) {
