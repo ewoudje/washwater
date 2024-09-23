@@ -5,7 +5,6 @@ import com.wetwater.washwater.FluidSection;
 import com.wetwater.washwater.FluidSectionContainer;
 import com.wetwater.washwater.WaterInfo;
 import com.wetwater.washwater.state.WashWaterFluidState;
-import me.jellysquid.mods.lithium.common.block.BlockCountingSection;
 import me.jellysquid.mods.lithium.common.block.TrackedBlockStatePredicate;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.function.Predicate;
 
 @Mixin(value = LevelChunkSection.class, priority = 1200)
-public class MixinLevelChunkSection implements FluidSectionContainer {
+public class MixinLevelChunkSectionLithium implements FluidSectionContainer {
     @Unique
     private FluidSection fluidSection;
 
@@ -74,15 +73,14 @@ public class MixinLevelChunkSection implements FluidSectionContainer {
     }*/
 
 
-/*    public boolean anyMatch(TrackedBlockStatePredicate predicate, boolean cir) {
+    public boolean anyMatch(TrackedBlockStatePredicate predicate, boolean cir) {
         if (fluidSection != null && !cir) {
             if(predicate.test(Blocks.WATER.defaultBlockState())) {
-                System.out.println("E");
                 cir = (!fluidSection.isEmpty());
             }
         }
         return cir;
-    }*/
+    }
 /*    @Override
     public boolean anyMatch(TrackedBlockStatePredicate predicate, boolean cir) {
         if (fluidSection != null && !cir) {
