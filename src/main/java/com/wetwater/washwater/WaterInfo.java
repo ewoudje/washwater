@@ -10,7 +10,7 @@ public class WaterInfo {
     public static short cutOffValue = (short) (volumePerLevel * 7);
     public static short surfaceTensionLimit = 20;
     public static int flowDivider = 8;
-
+    public static int minY = -64;
     public static short getWaterVolumeOfState(BlockState state) {
 
 

@@ -13,6 +13,13 @@ public class FluidFlow {
 
         if (volume > 0) {
 
+            if (pos.getY() == WaterInfo.minY) {
+                region.setVolume(pos, 0);
+                System.out.println("did");
+                return;
+            }
+
+
             //Flow down
             var underVolume = region.getVolume(pos.getX(), pos.getY() - 1 , pos.getZ());
             if (underVolume >= 0 && underVolume < WaterInfo.volumePerBlock) {

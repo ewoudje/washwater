@@ -130,8 +130,7 @@ public class WashFluidRenderer {
         FluidState fluidState = Fluids.WATER.defaultFluidState();
 
         boolean sfUp = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.UP);
-        boolean sfDown = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.DOWN) ||
-                !this.isSideExposed(level, posX, posY, posZ, Direction.DOWN, 0.8888889F);
+        boolean sfDown = posY >= WaterInfo.minY && (this.isFluidOccluded(level, height, posX, posY, posZ, Direction.DOWN) || !this.isSideExposed(level, posX, posY, posZ, Direction.DOWN, 0.8888889F));
         boolean sfNorth = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.NORTH);
         boolean sfSouth = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.SOUTH);
         boolean sfWest = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.WEST);
