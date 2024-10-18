@@ -33,7 +33,7 @@ public class BucketMechanics {
     }
 
     public static boolean creativePipettePlace(Level level, BlockPos pos, ItemStack itemStack, Player player) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide && pos.getY() != WaterInfo.minY) {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
@@ -48,7 +48,7 @@ public class BucketMechanics {
         int bucketFillLevel = itemStack.getTag().getInt("washwater:bucketFillLevel");
         int newBucketFillLevel = 0;
 
-        if (bucketFillLevel > 0 && !level.isClientSide) {
+        if (bucketFillLevel > 0 && !level.isClientSide && pos.getY() != WaterInfo.minY) {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
@@ -63,7 +63,7 @@ public class BucketMechanics {
     public static boolean precisionBucketPickup(Level level, BlockPos pos, ItemStack itemStack, Player player) {
         int bucketFillLevel = itemStack.getTag().getInt("washwater:bucketFillLevel");
         int bucketRemainingSpace = WaterInfo.volumePerBlock - bucketFillLevel;
-        if (!level.isClientSide) {
+        if (!level.isClientSide && pos.getY() != WaterInfo.minY) {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
@@ -101,7 +101,7 @@ public class BucketMechanics {
     }
 
     public static boolean creativePipetteDebug(Level level, BlockPos pos, ItemStack itemStack, Player player) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide && pos.getY() != WaterInfo.minY) {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
