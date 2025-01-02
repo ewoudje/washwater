@@ -31,6 +31,8 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -365,17 +367,17 @@ public class WashFluidRenderer {
 
                 TextureAtlasSprite sprite = sprites[1];
 
-                /*
+
                 if (isWater) {
                     BlockPos adjPos = this.tmpPos.set(adjX, adjY, adjZ);
                     BlockState adjBlock = level.getBlockState(adjPos);
 
-                    if (!adjBlock.canOcclude() && !adjBlock.isAir()) {
+                    if (!adjBlock.canOcclude() && !adjBlock.isAir() && !adjBlock.is(Blocks.WATER)) {
                         // ice, glass, stained glass, tinted glass
                         sprite = this.waterOverlaySprite;
-
                     }
-                }*/
+                }
+
 
                 float u1 = sprite.getU(0.0D);
                 float u2 = sprite.getU(8.0D);
