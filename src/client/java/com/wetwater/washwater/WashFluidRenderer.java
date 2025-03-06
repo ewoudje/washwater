@@ -372,7 +372,7 @@ public class WashFluidRenderer {
                     BlockPos adjPos = this.tmpPos.set(adjX, adjY, adjZ);
                     BlockState adjBlock = level.getBlockState(adjPos);
 
-                    if (!adjBlock.canOcclude() && !adjBlock.isAir() && !adjBlock.is(Blocks.WATER)) {
+                    if (!adjBlock.canOcclude() && !adjBlock.isAir()) {
                         // ice, glass, stained glass, tinted glass
                         sprite = this.waterOverlaySprite;
                     }
@@ -458,7 +458,7 @@ public class WashFluidRenderer {
         int[] biomeColors = this.colorBlender.getColors(level, pos, quad, colorSampler, fluidState);
 
         for (int i = 0; i < 4; i++) {
-            this.quadColors[i] = ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, 1f);
+            this.quadColors[i] = ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, quadLightData.br[i] * brightness);
         }
     }
 
