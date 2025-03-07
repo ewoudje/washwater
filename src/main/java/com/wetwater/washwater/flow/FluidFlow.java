@@ -11,7 +11,7 @@ public class FluidFlow {
     public static void tick(FluidRegion region, BlockPos pos) {
         int volume = region.getVolume(pos);
 
-        if (volume > 0) {
+        if (volume > WaterInfo.surfaceTensionLimit) {
 
 
             //Flow down
@@ -40,7 +40,10 @@ public class FluidFlow {
 
 
 
-        } else {
+        } else if (volume > 0){
+            PuddleFeature.execute(pos, volume, region);
+        }
+        else {
             WaterMod.LOGGER.warn("Ticking water with no volume");
         }
     }
