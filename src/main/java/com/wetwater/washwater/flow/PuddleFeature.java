@@ -22,12 +22,10 @@ public class PuddleFeature {
 
     public static void execute(BlockPos center, int volume, FluidRegion region) {
         if (!PUDDLE_FEATURE_ENABLED) return;
-        System.out.println("puddle called");
         //setWaterLevel(volume, center, world);
         pos = center;
 
         if (!isNotFull(pos.below(), region)) {
-            System.out.println("aAA");
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
@@ -73,7 +71,13 @@ public class PuddleFeature {
             var underVolume = region.getVolume(pos.getX(), pos.getY() - 1 , pos.getZ());
             var transaction = Math.min(volume, WaterInfo.volumePerBlock - underVolume);
             region.setVolume(pos, volume - transaction);
-            region.setVolume(pos.getX(), pos.getY() - 1, pos.getZ(), underVolume + transaction);
+            if (pos.getY() -1 == WaterInfo.minY && underVolume == 0) {
+                //Delete water
+                region.setVolume(pos, 0);
+            }
+            else if (underVolume >= 0){
+                region.setVolume(pos.getX(), pos.getY() - 1, pos.getZ(), underVolume + transaction);
+            }
         }
     }
 
@@ -99,7 +103,6 @@ public class PuddleFeature {
             minDistance = result[5][4];
             direction = Direction.EAST;
         }
-        System.out.println("direction null: " + direction == null);
         if (minDistance <= 4 && direction != null) {
             move(direction, volume, region);
             return true;
@@ -108,12 +111,10 @@ public class PuddleFeature {
     }
 
     private static boolean isNotFull(BlockPos pos, FluidRegion region) {
-        System.out.println(region.getVolume(pos));
         return region.getVolume(pos) < WaterInfo.volumePerBlock && region.getVolume(pos) > -1;
     }
 
     private static void move(Direction direction, int volume, FluidRegion region) {
-        System.out.println("moved");
         region.setVolume(pos, 0);
         region.setVolume(pos.offset(direction.getNormal()), region.getVolume(pos.offset(direction.getNormal())) + volume);
     }
