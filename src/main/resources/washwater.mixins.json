@@ -11,7 +11,11 @@
     "MixinLevelChunkSection",
     "MixinLevelChunkSectionLithium",
     "MixinServerLevel",
-    "MixinFarmBlock"
+    "MixinFarmBlock",
+    "MixinPointedDripstoneBlock"
+  ],
+  "server": [
+
   ],
   "injectors": {
     "defaultRequire": 1
