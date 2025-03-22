@@ -12,7 +12,8 @@
     "MixinLevelChunkSectionLithium",
     "MixinServerLevel",
     "MixinFarmBlock",
-    "MixinPointedDripstoneBlock"
+    "MixinPointedDripstoneBlock",
+    "MixinCropBlock"
   ],
   "server": [
 
