@@ -14,10 +14,9 @@ public class CropBlockEntity extends BlockEntity {
     public static void tick(Level level, BlockPos pos, BlockState state, CropBlockEntity entity) {
         //DO TICK STUFF
         if (!level.isClientSide) {
-            System.out.println("amongala");
-/*            if (FluidTicker.shouldTick((ServerLevel) level)) {
-                performSpoutAction(level, pos);
-            }*/
+
+
+
         }
     }
 

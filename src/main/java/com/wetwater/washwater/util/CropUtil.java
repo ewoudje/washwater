@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CropUtil {
 
@@ -39,6 +40,10 @@ public class CropUtil {
 
     public static float getTimeRelativeInsolation(ServerLevel level) {
         return (float) Mth.clamp(Math.sin(level.getSunAngle(1.0f) + (Math.PI/2)), 0, 1);
+    }
+
+    public static int getMainGrowthNutrient(BlockState state) {
+
     }
 
     //GROWTH METHODS
