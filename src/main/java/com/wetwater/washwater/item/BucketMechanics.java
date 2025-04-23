@@ -106,7 +106,9 @@ public class BucketMechanics {
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
             BlockPos blockPos2 = blockPos.relative(direction);
-            System.out.println("serverside, block at pos: " + level.getBlockState(blockPos2).getBlock());
+            //System.out.println("serverside, block at pos: " + level.getBlockState(blockPos2).getBlock());
+            System.out.println("serverside, block at pos: " + level.getBlockState(blockPos2) + "vol: " + FluidManager.getVolume(level, blockPos2));
+
         }
         else {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
@@ -114,7 +116,8 @@ public class BucketMechanics {
             Direction direction = blockHitResult.getDirection();
             BlockPos blockPos2 = blockPos.relative(direction);
             LevelAccessor levelAccessor;
-            System.out.println("clientside, block at pos: " + level.getBlockState(blockPos2).getBlock());
+            //System.out.println("clientside, block at pos: " + level.getBlockState(blockPos2).getBlock());
+            System.out.println("clientside, block at pos: " + level.getBlockState(blockPos2) + "vol: " + FluidManager.getVolume(level, blockPos2));
         }
         return true;
     }
