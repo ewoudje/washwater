@@ -13,7 +13,8 @@
     "MixinServerLevel",
     "MixinFarmBlock",
     "MixinPointedDripstoneBlock",
-    "MixinCropBlock"
+    "MixinCropBlock",
+    "MixinPistonBaseBlock"
   ],
   "server": [
 

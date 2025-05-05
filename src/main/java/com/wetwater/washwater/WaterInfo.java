@@ -11,6 +11,7 @@ public class WaterInfo {
     public static short surfaceTensionLimit = 20;
     public static int flowDivider = 8;
     public static int minY = -64;
+    public static int maxPistonPushingDistance = 8;
     public static short getWaterVolumeOfState(BlockState state) {
 
 

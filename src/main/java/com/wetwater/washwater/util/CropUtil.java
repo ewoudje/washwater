@@ -43,7 +43,7 @@ public class CropUtil {
     }
 
     public static int getMainGrowthNutrient(BlockState state) {
-
+        return 0;
     }
 
     //GROWTH METHODS

@@ -32,6 +32,44 @@ public class FluidManager {
         }
     }
 
+    public static int addVolumeAndReturnRemaining(ServerLevel level, BlockPos pos, int volume) {
+        int oldVolume = getVolume(level, pos);
+        if (oldVolume < 0) {
+            WaterMod.LOGGER.warn("Tried to add water volume to a non-air block");
+            return volume;
+        }
+
+        int remainder;
+        int newVolume = oldVolume + volume;
+        if (newVolume > WaterInfo.volumePerBlock) {
+            setVolume(level, pos, WaterInfo.volumePerBlock);
+            remainder = addVolumeAndReturnRemaining(level, pos.above(), newVolume - WaterInfo.volumePerBlock);
+        } else {
+            remainder = 0;
+            setVolume(level, pos, newVolume);
+        }
+        return remainder;
+    }
+
+    public static int addVolumeAndReturnRemainingImaginary(ServerLevel level, BlockPos pos, int volume) {
+        int oldVolume = getVolume(level, pos);
+        if (oldVolume < 0) {
+            WaterMod.LOGGER.warn("Tried to add water volume to a non-air block");
+            return volume;
+        }
+
+        int remainder;
+        int newVolume = oldVolume + volume;
+        if (newVolume > WaterInfo.volumePerBlock) {
+            //setVolume(level, pos, WaterInfo.volumePerBlock);
+            remainder = addVolumeAndReturnRemainingImaginary(level, pos.above(), newVolume - WaterInfo.volumePerBlock);
+        } else {
+            remainder = 0;
+            //setVolume(level, pos, newVolume);
+        }
+        return remainder;
+    }
+
     public static int getVolume(Level level, BlockPos pos) {
         return getVolume(level, pos.getX(), pos.getY(), pos.getZ());
     }
