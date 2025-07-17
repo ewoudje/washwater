@@ -41,7 +41,7 @@ public class MixinLevelChunkSectionLithium implements FluidSectionContainer {
     public void getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
         if (fluidSection != null && cir.getReturnValue().isAir()) {
             WashWaterFluidState waterState = ((WashWaterFluidState)(Object)WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
-            waterState.ww$setVolume(fluidSection.getWaterVolume(x, y, z));
+            waterState.ww€setVolume(fluidSection.getWaterVolume(x, y, z));
             cir.setReturnValue((((FluidState)(Object)waterState).createLegacyBlock()));
         }
 
@@ -51,7 +51,7 @@ public class MixinLevelChunkSectionLithium implements FluidSectionContainer {
     public void getFluidState(int x, int y, int z, CallbackInfoReturnable<FluidState> cir) {
         if (fluidSection != null && cir.getReturnValue().isEmpty()) {
             WashWaterFluidState waterState = ((WashWaterFluidState)(Object)WaterInfo.getWaterState(fluidSection.getWaterVolume(x, y, z)));
-            waterState.ww$setVolume(fluidSection.getWaterVolume(x, y, z));
+            waterState.ww€setVolume(fluidSection.getWaterVolume(x, y, z));
             cir.setReturnValue(((FluidState)(Object)waterState));
         }
     }

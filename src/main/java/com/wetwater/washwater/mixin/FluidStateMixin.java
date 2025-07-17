@@ -28,7 +28,7 @@ class FluidStateMixin implements WashWaterFluidState {
 
     @Override
     @Unique
-    public void ww$setVolume(short volume) {
+    public void ww€setVolume(short volume) {
         ww$volume = volume;
     }
 
