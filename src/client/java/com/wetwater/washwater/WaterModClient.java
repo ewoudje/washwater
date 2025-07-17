@@ -16,7 +16,6 @@ public class WaterModClient implements ClientModInitializer {
 	}
 
 	public static void registerItemProperties() {
-		// For versions before 1.21, replace 'Identifier.ofVanilla' with 'new Identifier'.
 		ItemProperties.register(PRECISION_BUCKET, new ResourceLocation("bucketlevel"), (itemStack, clientWorld, livingEntity, seed) -> {
 			return itemStack.getOrCreateTag().getInt("washwater:bucketFillLevel")/1000f;
 		});

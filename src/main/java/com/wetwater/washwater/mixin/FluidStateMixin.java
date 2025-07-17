@@ -32,11 +32,6 @@ class FluidStateMixin implements WashWaterFluidState {
         ww$volume = volume;
     }
 
-/*    @Inject(at = @At("HEAD"), method = "getHeight", cancellable = true)
-    public void getHeight(BlockGetter blockGetter, BlockPos blockPos, CallbackInfoReturnable<Float> cir) {
-        if (ww$volume < 0) return 0;
-        return ((float) ww$volume) / volumePerBlock;
-    }*/
     /**
      * @SirWashington
      * @We redefine this
@@ -47,5 +42,3 @@ class FluidStateMixin implements WashWaterFluidState {
         return ((float) ww$volume) / volumePerBlock;
     }
 }
-
-//((WashWaterFluidState) myFluidState).ww$getVolume();
