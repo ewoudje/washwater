@@ -13,23 +13,31 @@ public class FluidFlow {
 
         if (volume > 0) {
 
+
             //Flow down
             var underVolume = region.getVolume(pos.getX(), pos.getY() - 1 , pos.getZ());
-            if (underVolume >= 0 && underVolume < WaterInfo.volumePerBlock) {
-                var transaction = Math.min(volume, WaterInfo.volumePerBlock - underVolume);
-                region.setVolume(pos, volume - transaction);
-                region.setVolume(pos.getX(), pos.getY() - 1, pos.getZ(), underVolume + transaction);
-
-                volume -= transaction;
-
-                if (volume > 0) {
-                    //Flow downwards sideways
-                    equalizeWaterDownwards(region, pos, volume);
-                }
-            } else {
-                //If under is solid or filled up then flow to sides
-                equalizeWater(region, pos, volume);
+            if (pos.getY() -1 == WaterInfo.minY && underVolume == 0) {
+                //Delete water
+                    region.setVolume(pos, 0);
             }
+            else {
+                if (underVolume >= 0 && underVolume < WaterInfo.volumePerBlock) {
+                    var transaction = Math.min(volume, WaterInfo.volumePerBlock - underVolume);
+                    region.setVolume(pos, volume - transaction);
+                    region.setVolume(pos.getX(), pos.getY() - 1, pos.getZ(), underVolume + transaction);
+
+                    volume -= transaction;
+
+                    if (volume > 0) {
+                        //Flow downwards sideways
+                        equalizeWaterDownwards(region, pos, volume);
+                    }
+                } else {
+                    //If under is solid or filled up then flow to sides
+                    equalizeWater(region, pos, volume);
+                }
+            }
+
 
 
         } else {

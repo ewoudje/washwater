@@ -31,6 +31,8 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -130,8 +132,7 @@ public class WashFluidRenderer {
         FluidState fluidState = Fluids.WATER.defaultFluidState();
 
         boolean sfUp = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.UP);
-        boolean sfDown = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.DOWN) ||
-                !this.isSideExposed(level, posX, posY, posZ, Direction.DOWN, 0.8888889F);
+        boolean sfDown = posY >= WaterInfo.minY && (this.isFluidOccluded(level, height, posX, posY, posZ, Direction.DOWN) || !this.isSideExposed(level, posX, posY, posZ, Direction.DOWN, 0.8888889F));
         boolean sfNorth = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.NORTH);
         boolean sfSouth = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.SOUTH);
         boolean sfWest = this.isFluidOccluded(level, height, posX, posY, posZ, Direction.WEST);
@@ -366,7 +367,7 @@ public class WashFluidRenderer {
 
                 TextureAtlasSprite sprite = sprites[1];
 
-                /*
+
                 if (isWater) {
                     BlockPos adjPos = this.tmpPos.set(adjX, adjY, adjZ);
                     BlockState adjBlock = level.getBlockState(adjPos);
@@ -374,9 +375,9 @@ public class WashFluidRenderer {
                     if (!adjBlock.canOcclude() && !adjBlock.isAir()) {
                         // ice, glass, stained glass, tinted glass
                         sprite = this.waterOverlaySprite;
-
                     }
-                }*/
+                }
+
 
                 float u1 = sprite.getU(0.0D);
                 float u2 = sprite.getU(8.0D);
@@ -457,7 +458,7 @@ public class WashFluidRenderer {
         int[] biomeColors = this.colorBlender.getColors(level, pos, quad, colorSampler, fluidState);
 
         for (int i = 0; i < 4; i++) {
-            this.quadColors[i] = ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, 1f);
+            this.quadColors[i] = ColorABGR.mul(biomeColors != null ? biomeColors[i] : 0xFFFFFFFF, quadLightData.br[i] * brightness);
         }
     }
 

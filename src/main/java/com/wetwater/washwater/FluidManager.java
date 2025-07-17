@@ -71,10 +71,10 @@ public class FluidManager {
     }
 
     public static int getVolume(Level level, int x, int y, int z) {
-       return getVolume(
-               level.getChunk(x >> 4, z >> 4).getSections()[level.getSectionIndex(y)],
-               x & 15, y & 15, z & 15
-       );
+            return getVolume(
+                    level.getChunk(x >> 4, z >> 4).getSections()[level.getSectionIndex(y)],
+                    x & 15, y & 15, z & 15
+            );
     }
 
     public static int getVolume(LevelChunkSection section, int x, int y, int z) {

@@ -1,6 +1,5 @@
 package com.wetwater.washwater;
 
-import com.ewoudje.lasagna.chunkstorage.ExtraStorageSectionContainer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -11,7 +10,7 @@ public class WaterInfo {
     public static short cutOffValue = (short) (volumePerLevel * 7);
     public static short surfaceTensionLimit = 20;
     public static int flowDivider = 8;
-
+    public static int minY = -64;
     public static short getWaterVolumeOfState(BlockState state) {
 
 
@@ -26,9 +25,6 @@ public class WaterInfo {
 
     public static FluidState getWaterState(int value) {
         if (value <= 0) return Fluids.EMPTY.defaultFluidState();
-        //return Fluids.WATER.getFlowing(value / volumePerLevel + 1, false);
-        //System.out.println("amogus returned water");
-        //return Fluids.WATER.getFlowing(8, false);
         return Fluids.WATER.defaultFluidState();
     }
 

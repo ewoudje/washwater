@@ -14,6 +14,11 @@ repositories {
 	maven {
 		url = 'https://maven.valkyrienskies.org'
 	}
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+	}
+
 }
 
 loom {
@@ -36,6 +41,8 @@ dependencies {
 
 	modImplementation "com.ewoudje:lasagna-fabric:${project.lasagna_version}"
 	modCompileOnly("curse.maven:sodium-394468:3669187")
+	modCompileOnly("maven.modrinth:lithium:mc1.18.2-0.10.3")
+
 }
 
 processResources {
